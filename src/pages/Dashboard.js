@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import {
   Assessment,
@@ -22,156 +23,204 @@ import {
   ArrowUpward,
   ArrowDownward,
 } from '@mui/icons-material';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import api from '../services/api';
+import '../styles/dashboard.css';
 
 const Dashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalQuizzes: 0,
+    activeUsers: 0,
+    completionRate: 0,
+    studentGrowth: 0,
+    quizGrowth: 0,
+    userGrowth: 0,
+    completionGrowth: 0
+  });
+  const [performanceData, setPerformanceData] = useState([]);
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [statsRes, performanceRes, activitiesRes] = await Promise.all([
+          api.get('/api/dashboard/stats'),
+          api.get('/api/dashboard/performance'),
+          api.get('/api/dashboard/activities')
+        ]);
+
+        setStats(statsRes.data);
+        setPerformanceData(performanceRes.data);
+        setActivities(activitiesRes.data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box className="loading-overlay">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Container maxWidth="lg">
+    <Box className="main-content">
+      <Container maxWidth={false}>
         {/* Stats Cards */}
-        <Grid container spacing={3} mb={3}>
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    Total Students
-                  </Typography>
-                  <Typography variant="h4">2,500</Typography>
-                </Box>
-                <School sx={{ fontSize: 40, color: 'primary.main' }} />
-              </Box>
-              <Box display="flex" alignItems="center" mt={1}>
-                <ArrowUpward sx={{ color: 'success.main', mr: 1 }} />
-                <Typography variant="body2" color="success.main">
-                  +15% from last month
-                </Typography>
-              </Box>
-            </Paper>
+            <div className="stats-card">
+              <div className="stats-icon primary">
+                <School />
+              </div>
+              <Typography className="stats-label">Total Students</Typography>
+              <Typography className="stats-value">{stats.totalStudents}</Typography>
+              <div className={`stats-trend ${stats.studentGrowth >= 0 ? 'trend-up' : 'trend-down'}`}>
+                {stats.studentGrowth >= 0 ? <ArrowUpward /> : <ArrowDownward />}
+                <span>{Math.abs(stats.studentGrowth)}% from last month</span>
+              </div>
+            </div>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    Total Quizzes
-                  </Typography>
-                  <Typography variant="h4">150</Typography>
-                </Box>
-                <Assessment sx={{ fontSize: 40, color: 'info.main' }} />
-              </Box>
-              <Box display="flex" alignItems="center" mt={1}>
-                <ArrowUpward sx={{ color: 'success.main', mr: 1 }} />
-                <Typography variant="body2" color="success.main">
-                  +20% from last month
-                </Typography>
-              </Box>
-            </Paper>
+            <div className="stats-card">
+              <div className="stats-icon success">
+                <Assessment />
+              </div>
+              <Typography className="stats-label">Total Quizzes</Typography>
+              <Typography className="stats-value">{stats.totalQuizzes}</Typography>
+              <div className={`stats-trend ${stats.quizGrowth >= 0 ? 'trend-up' : 'trend-down'}`}>
+                {stats.quizGrowth >= 0 ? <ArrowUpward /> : <ArrowDownward />}
+                <span>{Math.abs(stats.quizGrowth)}% from last month</span>
+              </div>
+            </div>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    Active Users
-                  </Typography>
-                  <Typography variant="h4">1,200</Typography>
-                </Box>
-                <People sx={{ fontSize: 40, color: 'warning.main' }} />
-              </Box>
-              <Box display="flex" alignItems="center" mt={1}>
-                <ArrowUpward sx={{ color: 'success.main', mr: 1 }} />
-                <Typography variant="body2" color="success.main">
-                  +10% from last month
-                </Typography>
-              </Box>
-            </Paper>
+            <div className="stats-card">
+              <div className="stats-icon warning">
+                <People />
+              </div>
+              <Typography className="stats-label">Active Users</Typography>
+              <Typography className="stats-value">{stats.activeUsers}</Typography>
+              <div className={`stats-trend ${stats.userGrowth >= 0 ? 'trend-up' : 'trend-down'}`}>
+                {stats.userGrowth >= 0 ? <ArrowUpward /> : <ArrowDownward />}
+                <span>{Math.abs(stats.userGrowth)}% from last month</span>
+              </div>
+            </div>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="subtitle2" color="textSecondary">
-                    Quiz Completion Rate
-                  </Typography>
-                  <Typography variant="h4">85%</Typography>
-                </Box>
-                <Timeline sx={{ fontSize: 40, color: 'error.main' }} />
-              </Box>
-              <Box display="flex" alignItems="center" mt={1}>
-                <ArrowDownward sx={{ color: 'error.main', mr: 1 }} />
-                <Typography variant="body2" color="error.main">
-                  -5% from last month
-                </Typography>
-              </Box>
-            </Paper>
+            <div className="stats-card">
+              <div className="stats-icon danger">
+                <Timeline />
+              </div>
+              <Typography className="stats-label">Quiz Completion Rate</Typography>
+              <Typography className="stats-value">{stats.completionRate}%</Typography>
+              <div className={`stats-trend ${stats.completionGrowth >= 0 ? 'trend-up' : 'trend-down'}`}>
+                {stats.completionGrowth >= 0 ? <ArrowUpward /> : <ArrowDownward />}
+                <span>{Math.abs(stats.completionGrowth)}% from last month</span>
+              </div>
+            </div>
           </Grid>
         </Grid>
 
-        {/* Charts and Lists */}
-        <Grid container spacing={3}>
+        {/* Charts and Activities */}
+        <Grid container spacing={3} style={{ marginTop: '20px' }}>
           <Grid item xs={12} md={8}>
-            <Card>
-              <CardHeader 
-                title="Quiz Performance"
-                subheader="Last 7 days"
-                action={
-                  <Box>
-                    {/* Add chart controls here if needed */}
-                  </Box>
-                }
-              />
-              <CardContent>
-                <Box height={300}>
-                  {/* Add Chart Component here */}
-                  <Typography variant="body2" color="textSecondary">
-                    Chart will be implemented with recharts or chart.js
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
+            <div className="chart-container">
+              <div className="chart-header">
+                <Typography className="chart-title">Quiz Performance</Typography>
+                <div className="chart-controls">
+                  <button className="chart-control-btn active">7 Days</button>
+                  <button className="chart-control-btn">30 Days</button>
+                  <button className="chart-control-btn">3 Months</button>
+                </div>
+              </div>
+              <Box height={300}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={performanceData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="quizzes" 
+                      stroke="#1976d2" 
+                      name="Total Quizzes"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="completions" 
+                      stroke="#2e7d32" 
+                      name="Completions"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="score" 
+                      stroke="#ed6c02" 
+                      name="Avg Score"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Card>
-              <CardHeader 
-                title="Recent Activities"
-                subheader="Latest updates"
-              />
-              <CardContent>
-                <List>
-                  <ListItem>
-                    <ListItemText 
-                      primary="New Quiz Created: Mathematics Basics"
-                      secondary="2 hours ago"
-                    />
-                  </ListItem>
-                  <Divider />
-                  <ListItem>
-                    <ListItemText 
-                      primary="Student Achievement: Perfect Score"
-                      secondary="5 hours ago"
-                    />
-                  </ListItem>
-                  <Divider />
-                  <ListItem>
-                    <ListItemText 
-                      primary="New User Registration"
-                      secondary="1 day ago"
-                    />
-                  </ListItem>
-                  <Divider />
-                  <ListItem>
-                    <ListItemText 
-                      primary="Quiz Updated: Science Fundamentals"
-                      secondary="2 days ago"
-                    />
-                  </ListItem>
-                </List>
-              </CardContent>
-            </Card>
+            <div className="activities-list">
+              <Typography variant="h6" className="chart-title" gutterBottom>
+                Recent Activities
+              </Typography>
+              <List>
+                {activities.map((activity, index) => (
+                  <React.Fragment key={activity.id}>
+                    <div className="activity-item">
+                      <div className="activity-content">
+                        <div>
+                          <Typography className="activity-title">
+                            {activity.description}
+                          </Typography>
+                          <Typography className="activity-time">
+                            {activity.timeAgo}
+                          </Typography>
+                        </div>
+                      </div>
+                    </div>
+                    {index < activities.length - 1 && <Divider />}
+                  </React.Fragment>
+                ))}
+              </List>
+            </div>
           </Grid>
         </Grid>
       </Container>

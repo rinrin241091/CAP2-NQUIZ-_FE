@@ -15,30 +15,32 @@ const api = axios.create({
   },
 });
 
-// Add token to requests if it exists
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Add request/response logging in development
-if (process.env.NODE_ENV === 'development') {
-  api.interceptors.request.use(request => {
-    console.log('Starting Request:', request);
-    return request;
-  });
-
-  api.interceptors.response.use(response => {
-    console.log('Response:', response);
-    return response;
-  }, error => {
-    console.log('Response Error:', error);
+// Add request interceptor to include token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
-  });
-}
+  }
+);
+
+// Add response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth services
 export const login = (credentials) => api.post('/api/auth/login', credentials);
@@ -48,5 +50,10 @@ export const register = (userData) => api.post('/api/auth/register', userData);
 export const getProfile = () => api.get('/api/users/profile');
 export const updateProfile = (userData) => api.put('/api/users/profile', userData);
 export const updatePassword = (passwordData) => api.put('/api/users/password', passwordData);
+
+// Dashboard endpoints
+export const getDashboardStats = () => api.get('/api/dashboard/stats');
+export const getDashboardPerformance = () => api.get('/api/dashboard/performance');
+export const getDashboardActivities = () => api.get('/api/dashboard/activities');
 
 export default api; 

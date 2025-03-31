@@ -19,6 +19,7 @@ const Login = () => {
     password: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -29,12 +30,27 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
       const response = await login(formData);
-      localStorage.setItem('token', response.data.token);
-      navigate('/');
+      const { token, role } = response.data;
+      
+      // Store token and role
+      localStorage.setItem('token', token);
+      localStorage.setItem('userRole', role);
+      
+      // Redirect based on role
+      if (role === 'admin') {
+        navigate('/dashboard');
+      } else {
+        navigate('/home');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+      setError(err.response?.data?.message || 'An error occurred during login');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,9 +113,9 @@ const Login = () => {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
-                color="primary"
+                disabled={loading}
               >
-                Login
+                {loading ? 'Logging in...' : 'Login'}
               </Button>
               <Box sx={{ textAlign: 'center', mt: 2 }}>
                 <Typography variant="body2" color="text.secondary">
