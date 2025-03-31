@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../services/api';
 import {
   Container,
+  Grid,
   Paper,
   TextField,
   Button,
   Typography,
   Box,
-  Link,
+  Alert,
 } from '@mui/material';
-import { login } from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -38,64 +39,89 @@ const Login = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
-          <Typography component="h1" variant="h5" align="center">
-            Sign in
-          </Typography>
-          {error && (
-            <Typography color="error" align="center" sx={{ mt: 1 }}>
-              {error}
+    <Container maxWidth="lg" sx={{ mt: 8 }}>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 4, height: '100%' }}>
+            <Typography variant="h4" gutterBottom>
+              Welcome to NQuiz
             </Typography>
-          )}
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
-            <Box sx={{ textAlign: 'center' }}>
-              <Link href="/register" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
+            <Typography variant="body1" paragraph>
+              NQuiz is a comprehensive quiz management system designed to help educators create, manage, and administer quizzes efficiently.
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              With NQuiz, you can:
+            </Typography>
+            <Box component="ul" sx={{ pl: 2 }}>
+              <Typography component="li" variant="body1">Create and manage multiple quizzes</Typography>
+              <Typography component="li" variant="body1">Track student progress and performance</Typography>
+              <Typography component="li" variant="body1">Generate detailed reports and analytics</Typography>
+              <Typography component="li" variant="body1">Share quizzes with your students</Typography>
             </Box>
-          </Box>
-        </Paper>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 4 }}>
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={formData.email}
+                onChange={handleChange}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                color="primary"
+              >
+                Login
+              </Button>
+              <Box sx={{ textAlign: 'center', mt: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Don't have an account?
+                </Typography>
+                <Button
+                  component={Link}
+                  to="/register"
+                  variant="outlined"
+                  sx={{ mt: 1 }}
+                >
+                  Create an account
+                </Button>
+              </Box>
+            </form>
+          </Paper>
+        </Grid>
+      </Grid>
+      <Box sx={{ mt: 4, textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          Copyright NQuiz © 2024
+        </Typography>
       </Box>
     </Container>
   );
