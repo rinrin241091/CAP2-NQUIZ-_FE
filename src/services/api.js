@@ -1,21 +1,17 @@
+// src/services/api.js
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Log environment variables in development
-if (process.env.NODE_ENV === 'development') {
-  console.log('API URL:', API_URL);
-  console.log('Environment:', process.env.NODE_ENV);
-}
-
+// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 
-// Add request interceptor to include token
+// Add token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -29,31 +25,46 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle token expiration
+// Handle token expiration
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userRole');
+      localStorage.clear();
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-// Auth services
-export const login = (credentials) => api.post('/api/auth/login', credentials);
-export const register = (userData) => api.post('/api/auth/register', userData);
+// Auth endpoints
+export const login = (credentials) => api.post('/auth/login', credentials);
+export const register = (userData) => api.post('/auth/register', userData);
+export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
+export const resetPassword = (token, password) => api.post('/auth/reset-password', { token, password });
 
-// User services
-export const getProfile = () => api.get('/api/users/profile');
-export const updateProfile = (userData) => api.put('/api/users/profile', userData);
-export const updatePassword = (passwordData) => api.put('/api/users/password', passwordData);
+// User endpoints
+export const getUsers = (params) => api.get('/users', { params });
+export const getUser = (id) => api.get(`/users/${id}`);
+export const createUser = (userData) => api.post('/users', userData);
+export const updateUser = (id, userData) => api.put(`/users/${id}`, userData);
+export const deleteUser = (id) => api.delete(`/users/${id}`);
+export const updateProfile = (userData) => api.put('/users/profile', userData);
+export const changePassword = (passwords) => api.post('/users/change-password', passwords);
+export const uploadAvatar = (formData) => api.post('/users/avatar', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
 
 // Dashboard endpoints
-export const getDashboardStats = () => api.get('/api/dashboard/stats');
-export const getDashboardPerformance = () => api.get('/api/dashboard/performance');
-export const getDashboardActivities = () => api.get('/api/dashboard/activities');
+export const getDashboardStats = () => api.get('/dashboard/stats');
+export const getDashboardPerformance = () => api.get('/dashboard/performance');
+export const getDashboardActivities = () => api.get('/dashboard/activities');
 
-export default api; 
+// Quiz endpoints
+export const getQuizzes = (params) => api.get('/quizzes', { params });
+export const getQuiz = (id) => api.get(`/quizzes/${id}`);
+export const createQuiz = (quizData) => api.post('/quizzes', quizData);
+export const updateQuiz = (id, quizData) => api.put(`/quizzes/${id}`, quizData);
+export const deleteQuiz = (id) => api.delete(`/quizzes/${id}`);
+
+export default api;

@@ -10,6 +10,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Home from './pages/Home';
+import UserList from './components/users/UserList';
+
 
 const theme = createTheme({
   palette: {
@@ -73,6 +75,15 @@ function App() {
                 )}
               </RequireAuth>
             } 
+          />
+
+          <Route 
+            path="/dashboard/users" 
+            element={
+              <RequireAdmin>
+                <UserList />
+              </RequireAdmin>
+            }
           />
         </Routes>
       </Router>
