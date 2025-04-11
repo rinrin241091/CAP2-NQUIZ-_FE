@@ -27,7 +27,7 @@ This is the frontend application for NQuiz, a quiz management system.
    ```
 4. Create a `.env` file in the root directory and add the following:
    ```
-   REACT_APP_API_URL=http://localhost:5000
+   REACT_APP_API_URL=http://localhost:3000
    ```
 
 ## Running the Application
@@ -66,4 +66,4 @@ src/
 - Material-UI
 - React Router
 - Axios
-- Web Vitals 
+- Web Vitals

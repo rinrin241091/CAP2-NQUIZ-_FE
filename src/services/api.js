@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 // Create axios instance
 const api = axios.create({
@@ -38,8 +38,8 @@ api.interceptors.response.use(
 );
 
 // Auth endpoints
-export const login = (credentials) => api.post('/auth/login', credentials);
-export const register = (userData) => api.post('/auth/register', userData);
+export const login = (credentials) => api.post('/user/login', credentials);
+export const register = (userData) => api.post('/user/register', userData);
 export const forgotPassword = (email) => api.post('/auth/forgot-password', { email });
 export const resetPassword = (token, password) => api.post('/auth/reset-password', { token, password });
 
