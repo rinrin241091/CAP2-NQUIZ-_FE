@@ -1,0 +1,206 @@
+.create-question-page {
+    display: flex;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    padding: 2rem;
+    background-color: #2a2a2a;
+    border-right: 1px solid #3a3a3a;
+  }
+  
+  .question-type-selector {
+    margin-bottom: 2rem;
+  }
+  
+  .question-type-selector h3 {
+    margin-bottom: 1rem;
+    color: #ccc;
+  }
+  
+  .type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .type-button {
+    padding: 0.75rem;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease; /* Thêm transition để hiệu ứng mượt mà */
+  }
+  
+  .type-button:hover {
+    background-color: #444;
+  }
+  
+  /* Hiệu ứng khi nút được chọn */
+  .type-button.active {
+    background-color: #555; /* Nền sáng hơn */
+    border: 2px solid #fff; /* Viền trắng */
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  /* File Upload Styles */
+  .file-upload {
+    margin-top: 1rem;
+  }
+  
+  .file-upload input[type="file"] {
+    display: block;
+    margin-bottom: 0.5rem;
+    padding: 5px;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  .file-hint {
+    font-size: 0.875rem;
+    color: #888;
+  }
+  
+  /* Khu vực chính */
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #1a1a1a;
+  }
+  
+  .header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: flex-end;
+  }
+  
+  .header button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .done-btn {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .preview-btn {
+    background-color: #2196F3;
+    color: white;
+  }
+  
+  .add-slide-btn {
+    background-color: #9C27B0;
+    color: white;
+  }
+  
+  .question-form {
+    background-color: #2a2a2a;
+    padding: 2rem;
+    border-radius: 8px;
+  }
+  
+  .form-group {
+    margin-bottom: 2rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ccc;
+  }
+  
+  textarea {
+    width: 100%;
+    padding: 1rem;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    resize: vertical;
+  }
+  
+  .answer-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .answer-item input[type="text"] {
+    flex: 1;
+    padding: 0.5rem;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  .remove-answer-btn {
+    padding: 0.25rem 0.5rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 2rem;
+  }
+  
+  .submit-btn:hover {
+    background-color: #45a049;
+  }
+
+  .quiz-title-input {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .quiz-title-input:focus {
+    outline: none;
+    border-color: #00AEEF;
+  }
+  
+  .question-counter {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: auto;
+  }
+  
+  .answer-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: normal;
+    margin-left: 8px;
+  }

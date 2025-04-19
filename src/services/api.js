@@ -67,4 +67,8 @@ export const createQuiz = (quizData) => api.post('/quizzes', quizData);
 export const updateQuiz = (id, quizData) => api.put(`/quizzes/${id}`, quizData);
 export const deleteQuiz = (id) => api.delete(`/quizzes/${id}`);
 
+// Question endpoints
+export const createQuestion = (questionData) => api.post('/question', questionData);
+export const getQuizQuestions = (quizId) => api.get(`/question/quiz/${quizId}`);
+
 export default api;

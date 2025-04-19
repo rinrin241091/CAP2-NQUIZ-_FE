@@ -12,6 +12,7 @@ import SportsPage from "./pages/SportsPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import CreateQuestion from "./pages/CreateQuestion";
 
 // Main App component
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create-question" element={<CreateQuestion />} />
         </Routes>
       </div>
     </Router>
@@ -98,6 +100,8 @@ function Navigation() {
 
 // Hero section with two cards
 function HeroSection() {
+  const navigate = useNavigate();
+  
   return (
     <section className="hero-section">
       <div className="hero-card create-quiz">
@@ -110,7 +114,12 @@ function HeroSection() {
           <div className="hero-text">
             <h2>Create a quiz</h2>
             <p>Play for free with 500 participants</p>
-            <button className="hero-btn">Create custom</button>
+            <button 
+              className="hero-btn"
+              onClick={() => navigate('/create-question')}
+            >
+              Create custom
+            </button>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -41,6 +41,7 @@ const categories = [
 
 const HomePage = () => {
   const [gamePin, setGamePin] = useState('');
+  const navigate = useNavigate();
 
   return (
     <div className="homepage">
@@ -86,7 +87,11 @@ const HomePage = () => {
                   <Typography variant="body1">
                     Play for free with 300 participants
                   </Typography>
-                  <Button variant="contained" color="primary">
+                  <Button 
+                    variant="contained" 
+                    color="primary"
+                    onClick={() => navigate('/create-question')}
+                  >
                     Quiz editor
                   </Button>
                 </div>
