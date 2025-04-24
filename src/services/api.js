@@ -41,22 +41,20 @@ api.interceptors.request.use(
 
 // Auth endpoints
 export const login = (credentials) => api.post("/user/login", credentials);
-// export const login = async (credentials) => {
-//   const res = await api.post("/user/login", credentials);
-//   localStorage.setItem("user", JSON.stringify(res.data));
-//   return res.data;
-// };
 export const register = (userData) => api.post("/user/register", userData);
 export const forgotPassword = (email) =>
-  api.post("/auth/forgot-password", { email });
-export const resetPassword = (token, password) =>
-  api.post("/auth/reset-password", { token, password });
+  api.post("/user/forgot-password", { email });
+export const verifyOTP = (email, otp) =>
+  api.post("/user/verify-otp", { email, otp });
+export const resetPassword = (email, otp, newPassword) =>
+  api.post("/user/reset-password", { email, otp, newPassword });
 export const checkUsernameAvailability = (username) =>
   api.get(`/user/check-username/${username}`);
 
 // User endpoints
 export const getUsers = (params) => api.get("/user/admin/all", { params });
-export const getUser = () => {return api.get("/user/profile");}
+export const getUser = () => api.get("/user/profile");
+export const updateProfile = (userData) => api.put("/user/profile", userData);
 export const searchUserByUserName = (username, userData) =>
   api.get(`/user/admin/search/${username}`, userData);
 export const createUser = (userData) => api.post("/user/admin/add", userData);
@@ -64,7 +62,6 @@ export const updateUser = (user_id, userData) =>
   api.put(`/user/admin/update/${user_id}`, userData);
 export const deleteUser = (user_id) =>
   api.delete(`/user/admin/delete/${user_id}`);
-export const updateProfile = (userData) => api.put("/user/profile", userData);
 export const changePassword = (passwords) =>
   api.post("/user/change-password", passwords);
 export const uploadAvatar = (formData) =>

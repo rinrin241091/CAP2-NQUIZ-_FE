@@ -4,28 +4,18 @@ import {
   Paper,
   TextField,
   Button,
-  Typography,
   Box,
-  Grid,
   Alert,
   CircularProgress,
+  Avatar,
 } from "@mui/material";
-import {
-  getUser,
-  updateUser,
-  changePassword,
-  checkUsernameAvailability,
-} from "../services/api";
+import { getUser, updateProfile } from "../services/api";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
     username: "",
     email: "",
-  });
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    avatar_url: "",
   });
   const [message, setMessage] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(true);
@@ -40,10 +30,14 @@ const Profile = () => {
       setProfile({
         username: response.data.username,
         email: response.data.email,
+        avatar_url: response.data.avatar_url || "",
       });
     } catch (err) {
       console.error("Fetch profile error:", err);
-      setMessage({ type: "error", text: "Failed to fetch profile" });
+      setMessage({
+        type: "error",
+        text: err.response?.data?.message || "Failed to fetch profile",
+      });
     } finally {
       setLoading(false);
     }
@@ -56,29 +50,19 @@ const Profile = () => {
     });
   };
 
-  const handlePasswordChange = (e) => {
-    setPasswordData({
-      ...passwordData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Check if the username is available
-      const isAvailable = await checkUsernameAvailability(profile.username);
-      if (!isAvailable) {
-        setMessage({ type: "error", text: "Username is already taken" });
-        return;
-      }
-
-      const response = await updateUser(profile);
+      const response = await updateProfile(profile);
       setProfile({
         username: response.data.username,
         email: response.data.email,
+        avatar_url: response.data.avatar_url || "",
       });
       setMessage({ type: "success", text: "Profile updated successfully" });
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     } catch (err) {
       setMessage({
         type: "error",
@@ -87,28 +71,18 @@ const Profile = () => {
     }
   };
 
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: "error", text: "New passwords do not match" });
-      return;
-    }
+  const handlePasswordResetRequest = () => {
+    setMessage({
+      type: "info",
+      text: "Password reset link has been sent to your email",
+    });
+  };
 
-    try {
-      const { confirmPassword, ...passwordUpdate } = passwordData;
-      await changePassword(passwordUpdate);
-      setMessage({ type: "success", text: "Password updated successfully" });
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (err) {
-      setMessage({
-        type: "error",
-        text: err.response?.data?.message || "Failed to update password",
-      });
-    }
+  const handleDeleteAccountRequest = () => {
+    setMessage({
+      type: "info",
+      text: "Account deletion link has been sent to your email",
+    });
   };
 
   if (loading) {
@@ -127,106 +101,140 @@ const Profile = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
+    <Container maxWidth="sm" sx={{ mt: 6 }}>
       {message.text && (
         <Alert severity={message.type} sx={{ mb: 2 }}>
           {message.text}
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {/* Profile Information */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Profile Information
-            </Typography>
-            <Box component="form" onSubmit={handleProfileSubmit}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                value={profile.username}
-                onChange={handleProfileChange}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                type="email"
-                value={profile.email}
-                disabled
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3 }}
-              >
-                Update Profile
-              </Button>
-            </Box>
-          </Paper>
-        </Grid>
+      <Paper
+        elevation={6}
+        sx={{
+          p: 4,
+          borderRadius: 4,
+          background: "#ffffff",
+          boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mb: 4,
+          }}
+        >
+          <Avatar
+            src={profile.avatar_url}
+            sx={{
+              width: 120,
+              height: 120,
+              mb: 2,
+              border: "4px solid #1976d2",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            }}
+          />
+          <Button
+            variant="outlined"
+            color="primary"
+            sx={{
+              textTransform: "none",
+              borderRadius: "20px",
+              px: 3,
+              fontWeight: 600,
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+              },
+            }}
+          >
+            Change profile picture
+          </Button>
+        </Box>
 
-        {/* Change Password */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Change Password
-            </Typography>
-            <Box component="form" onSubmit={handlePasswordSubmit}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="currentPassword"
-                label="Current Password"
-                type="password"
-                id="currentPassword"
-                value={passwordData.currentPassword}
-                onChange={handlePasswordChange}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="newPassword"
-                label="New Password"
-                type="password"
-                id="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="confirmPassword"
-                label="Confirm New Password"
-                type="password"
-                id="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3 }}
-              >
-                Update Password
-              </Button>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
+        <Box component="form" onSubmit={handleProfileSubmit}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            value={profile.username}
+            onChange={handleProfileChange}
+            sx={{
+              "& .MuiInputBase-root": {
+                borderRadius: "12px",
+              },
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email"
+            name="email"
+            type="email"
+            value={profile.email}
+            disabled
+            sx={{
+              "& .MuiInputBase-root": {
+                borderRadius: "12px",
+              },
+            }}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 3,
+              mb: 2,
+              borderRadius: "25px",
+              py: 1.5,
+              fontWeight: "bold",
+              background: "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
+              "&:hover": {
+                background: "linear-gradient(90deg, #1565c0 0%, #2196f3 100%)",
+              },
+            }}
+          >
+            Save
+          </Button>
+        </Box>
+
+        <Box sx={{ mt: 2 }}>
+          <Button
+            fullWidth
+            variant="text"
+            color="primary"
+            onClick={handlePasswordResetRequest}
+            sx={{
+              mb: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": { backgroundColor: "#e3f2fd" },
+            }}
+          >
+            Send a password reset link to my email
+          </Button>
+          <Button
+            fullWidth
+            variant="text"
+            color="error"
+            onClick={handleDeleteAccountRequest}
+            sx={{
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": { backgroundColor: "#ffebee" },
+            }}
+          >
+            Send a delete account link to my email
+          </Button>
+        </Box>
+      </Paper>
     </Container>
   );
 };

@@ -166,6 +166,16 @@ const Login = () => {
                 >
                   Create an account
                 </Button>
+                <Box sx={{ mt: 2 }}>
+                  <Button
+                    component={Link}
+                    to="/forgot-password"
+                    variant="text"
+                    color="primary"
+                  >
+                    Forgot Password?
+                  </Button>
+                </Box>
               </Box>
             </form>
           </Paper>

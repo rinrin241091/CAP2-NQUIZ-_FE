@@ -5,7 +5,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import "../assets/styles/Header.css";
 
 // Component cho phần Input PIN
-const PinInput = ({ pinValue, handlePinChange }) => (
+const PinInput = ({ pinValue, handlePinChange, handlePinSubmit }) => (
   <div className="pin-container">
     <label>Join Game, Enter PIN:</label>
     <input
@@ -13,6 +13,11 @@ const PinInput = ({ pinValue, handlePinChange }) => (
       placeholder="123456"
       value={pinValue}
       onChange={handlePinChange}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handlePinSubmit();
+        }
+      }}
       className="pin-input"
     />
   </div>
@@ -68,11 +73,10 @@ function Header() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [pinValue, setPinValue] = useState("");
   const [user, setUser] = useState(null);
-
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
   const navigate = useNavigate();
 
-  // Function to update user state from localStorage
+  // Cập nhật user từ localStorage
   const updateUserState = () => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -89,12 +93,10 @@ function Header() {
     }
   };
 
-  // Initial user state setup
   useEffect(() => {
     updateUserState();
   }, []);
 
-  // Listen for login/logout events
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === "user") {
@@ -117,6 +119,12 @@ function Header() {
 
   const handlePinChange = (e) => {
     setPinValue(e.target.value);
+  };
+
+  const handlePinSubmit = () => {
+    if (pinValue.trim() !== "") {
+      navigate(`/game/${pinValue}`);
+    }
   };
 
   const handleSettingsClick = (event) => {
@@ -149,7 +157,11 @@ function Header() {
       <div className="main-header">
         <div className="logo">NQUIZ.com</div>
 
-        <PinInput pinValue={pinValue} handlePinChange={handlePinChange} />
+        <PinInput
+          pinValue={pinValue}
+          handlePinChange={handlePinChange}
+          handlePinSubmit={handlePinSubmit}
+        />
 
         <div className="header-buttons">
           <SearchBar

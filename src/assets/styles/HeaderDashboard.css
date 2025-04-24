@@ -7,8 +7,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  background-color: white;
+  padding: 12px 24px;
+  background-color: #fdfbf5;
   /* border-bottom: 1px solid #eee; */
   position: relative;
 }

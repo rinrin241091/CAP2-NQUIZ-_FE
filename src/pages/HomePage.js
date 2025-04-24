@@ -82,7 +82,7 @@ function HeroSection() {
           <div className="hero-text">
             <h2>Create a quiz</h2>
             <p>Play for free with 500 participants</p>
-            <button className="hero-btn">Create custom</button>
+            <button className="hero-btn">Quiz editor</button>
           </div>
         </div>
       </div>

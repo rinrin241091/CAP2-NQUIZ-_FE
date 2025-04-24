@@ -10,6 +10,7 @@ import LanguagesPage from "./pages/LanguagesPage";
 import ScienceNaturePage from "./pages/ScienceNaturePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import { RequireAuth, RequireAdmin } from "./middleware/authMiddleware";
@@ -29,6 +30,7 @@ function App() {
         <Route path="/sciencenature" element={<ScienceNaturePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes */}
         <Route
