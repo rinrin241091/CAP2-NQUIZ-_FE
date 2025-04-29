@@ -86,7 +86,7 @@ function HeroSection() {
 
             <button
               className="hero-btn"
-              onClick={() => navigate("/quiz-editor")}
+              onClick={() => navigate("/create-quiz")}
             >
               Quiz editor
             </button>

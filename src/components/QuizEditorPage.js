@@ -81,8 +81,8 @@ export default function QuizEditorPage() {
       <div className="quiz-editor-header">
         <div className="quiz-editor-header-left">
           <img src="/logo.png" alt="Logo" className="logo" />
-          <button className="btn-back-editor" onClick={() => navigate("/")}>
-            ← Back to Home
+          <button className="btn-back-editor" onClick={() => navigate("/create-quiz")}>
+            ← Back to Create Quiz
           </button>
         </div>
         <div className="quiz-editor-header-right">

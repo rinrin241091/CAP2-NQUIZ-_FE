@@ -21,7 +21,6 @@ import MultipleCorrectAnswers from "./components/MultipleCorrectAnswers";
 import CreateQuiz from "./pages/CreateQuiz";
 import MyQuizzes from "./pages/MyQuizzes";
 
-
 function App() {
   return (
     <div className="app">
@@ -39,7 +38,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/quiz-editor" element={<QuizEditorPage />} />
         <Route path="/one-correct-answer" element={<OneCorrectAnswer />} />
-        <Route path="/multiple-correct-answers" element={<MultipleCorrectAnswers />} />
+        <Route
+          path="/multiple-correct-answers"
+          element={<MultipleCorrectAnswers />}
+        />
 
         {/* Protected Routes */}
         <Route
