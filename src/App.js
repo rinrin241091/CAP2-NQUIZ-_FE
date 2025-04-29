@@ -15,14 +15,12 @@ import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import { RequireAuth, RequireAdmin } from "./middleware/authMiddleware";
 import Profile from "./pages/Profile";
-<<<<<<< HEAD
 import QuizEditorPage from "./components/QuizEditorPage";
 import OneCorrectAnswer from "./components/OneCorrectAnswer";
 import MultipleCorrectAnswers from "./components/MultipleCorrectAnswers";
-=======
 import CreateQuiz from "./pages/CreateQuiz";
 import MyQuizzes from "./pages/MyQuizzes";
->>>>>>> 5c4fdc636a3772719463b898bcf375781d9798fa
+
 
 function App() {
   return (
