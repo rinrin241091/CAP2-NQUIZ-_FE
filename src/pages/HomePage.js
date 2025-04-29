@@ -70,6 +70,8 @@ function Navigation() {
 }
 
 function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="hero-section">
       <div className="hero-card create-quiz">
@@ -82,7 +84,13 @@ function HeroSection() {
           <div className="hero-text">
             <h2>Create a quiz</h2>
             <p>Play for free with 500 participants</p>
-            <button className="hero-btn">Quiz editor</button>
+
+            <button 
+              className="hero-btn"
+              onClick={() => navigate('/create-quiz')}
+            >
+              Create custom
+            </button>
           </div>
         </div>
       </div>

@@ -15,6 +15,8 @@ import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import { RequireAuth, RequireAdmin } from "./middleware/authMiddleware";
 import Profile from "./pages/Profile";
+import CreateQuiz from "./pages/CreateQuiz";
+import MyQuizzes from "./pages/MyQuizzes";
 
 function App() {
   return (
@@ -46,6 +48,22 @@ function App() {
           element={
             <RequireAuth>
               <Profile />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/create-quiz"
+          element={
+            <RequireAuth>
+              <CreateQuiz />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/my-quizzes"
+          element={
+            <RequireAuth>
+              <MyQuizzes />
             </RequireAuth>
           }
         />
