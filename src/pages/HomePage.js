@@ -83,6 +83,7 @@ function HeroSection() {
           <div className="hero-text">
             <h2>Create a quiz</h2>
             <p>Play for free with 500 participants</p>
+
             <button
               className="hero-btn"
               onClick={() => navigate("/quiz-editor")}
