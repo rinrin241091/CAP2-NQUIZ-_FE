@@ -104,13 +104,13 @@ function Header() {
   };
 
   return (
-    <header className="header">
+    <header className="header-dashboard">
       <div className="main-header-dashboard">
         <div className="logo">NQUIZ Dashboard</div>
 
-        <div className="header-buttons">
+        <div className="header-dashboard-buttons">
           <IconButton
-            className="settings-btn"
+            className="settings-btn-dashboard"
             aria-label="Settings"
             onClick={handleSettingsClick}
           >

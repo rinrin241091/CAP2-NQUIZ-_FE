@@ -15,6 +15,9 @@ import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import { RequireAuth, RequireAdmin } from "./middleware/authMiddleware";
 import Profile from "./pages/Profile";
+import QuizEditorPage from "./components/QuizEditorPage";
+import OneCorrectAnswer from "./components/OneCorrectAnswer";
+import MultipleCorrectAnswers from "./components/MultipleCorrectAnswers";
 
 function App() {
   return (
@@ -31,6 +34,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/quiz-editor" element={<QuizEditorPage />} />
+        <Route path="/one-correct-answer" element={<OneCorrectAnswer />} />
+        <Route path="/multiple-correct-answers" element={<MultipleCorrectAnswers />} />
 
         {/* Protected Routes */}
         <Route

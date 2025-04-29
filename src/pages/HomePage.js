@@ -10,7 +10,7 @@ function HomePage() {
     <>
       <Header />
       <Navigation />
-      <main className="main-content">
+      <main className="main-content-homepage">
         <HeroSection />
         <QuizSection
           title="Recently published"
@@ -53,7 +53,7 @@ function Navigation() {
 
   return (
     <nav className="main-nav">
-      <div className="nav-container">
+      <div className="nav-container-homepage">
         {navItems.map((item, index) => (
           <div
             key={index}
@@ -70,6 +70,7 @@ function Navigation() {
 }
 
 function HeroSection() {
+  const navigate = useNavigate();
   return (
     <section className="hero-section">
       <div className="hero-card create-quiz">
@@ -82,7 +83,12 @@ function HeroSection() {
           <div className="hero-text">
             <h2>Create a quiz</h2>
             <p>Play for free with 500 participants</p>
-            <button className="hero-btn">Quiz editor</button>
+            <button
+              className="hero-btn"
+              onClick={() => navigate("/quiz-editor")}
+            >
+              Quiz editor
+            </button>
           </div>
         </div>
       </div>

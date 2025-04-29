@@ -1,5 +1,5 @@
-/* Header.css */
-.header {
+/* HeaderDashboard.css */
+.header-dashboard {
   width: 100%;
 }
 
@@ -36,14 +36,14 @@
   width: 150px;
 }
 
-.header-buttons {
+.header-dashboard-buttons {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
 .search-btn,
-.settings-btn {
+.settings-btn-dashboard {
   color: #666 !important;
   padding: 8px !important;
   border-radius: 50% !important;
@@ -51,16 +51,16 @@
 }
 
 .search-btn:hover,
-.settings-btn:hover {
+.settings-btn-dashboard:hover {
   background-color: rgba(0, 0, 0, 0.04) !important;
   transform: rotate(30deg);
 }
 
-.settings-btn {
+.settings-btn-dashboard {
   margin: 0 4px !important;
 }
 
-.settings-btn svg {
+.settings-btn-dashboard svg {
   font-size: 24px;
 }
 

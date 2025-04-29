@@ -1,16 +1,48 @@
 /* homepage.css */
 
+/* Root variables */
+:root {
+  --primary-color: #0e3b43;
+  --secondary-color: #f8903f;
+  --text-color: #333;
+  --light-bg: #f8f8f8;
+  --border-radius: 8px;
+}
+
+/* Thiết lập cho body và html để chiếm toàn bộ viewport */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  height: 100%; /* Đảm bảo html và body chiếm toàn bộ chiều cao */
+  width: 100%; /* Đảm bảo html và body chiếm toàn bộ chiều rộng */
+  overflow-x: hidden; /* Ẩn thanh cuộn ngang */
+}
+
+/* Nếu bạn có một container bao bọc toàn bộ nội dung trang (ví dụ: #root trong React) */
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 /* Navigation Styles */
 .main-nav {
   background-color: white;
   padding: 10px 0;
-  overflow-x: auto;
+  width: 100%; /* Chiếm toàn bộ chiều rộng */
+  box-sizing: border-box;
 }
 
-.nav-container {
+.nav-container-homepage {
   display: flex;
   gap: 15px;
   padding: 0 20px;
+  justify-content: space-evenly; /* Khoảng trắng đều giữa các item và ở hai đầu */
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto; /* Cho phép cuộn ngang nếu quá nhiều item */
 }
 
 .nav-item {
@@ -32,9 +64,12 @@
 }
 
 /* Main Content */
-.main-content {
+.main-content-homepage {
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: var(--light-bg);
+  width: 100%;
+  box-sizing: border-box;
+  flex-grow: 1; /* Cho phép main-content mở rộng để lấp đầy không gian còn lại */
 }
 
 /* Hero Section */
@@ -43,6 +78,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .hero-card {
@@ -52,16 +89,22 @@
   padding: 20px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
 }
 
 .hero-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .hero-image {
   max-width: 120px;
+  height: auto;
 }
 
 .hero-text {
@@ -89,10 +132,7 @@
 }
 
 .hero-btn:hover {
-  background-color: var(
-    --hover-color,
-    #ffe100
-  ); /* fallback nếu --hover-color chưa có */
+  background-color: var(--hover-color, #ffe100);
   color: black;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -102,6 +142,8 @@
 /* Quiz Sections */
 .quiz-section {
   margin-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -109,6 +151,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header h2 {
@@ -118,18 +162,23 @@
 
 .quiz-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .quiz-card {
-  border: 1px solid #777;
+  border: 1px solid #ccc;
   border-radius: var(--border-radius);
   overflow: hidden;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
 }
 
 .quiz-image-container {
-  height: 120px;
+  height: 150px;
   overflow: hidden;
 }
 
@@ -140,68 +189,77 @@
 }
 
 .quiz-details {
-  padding: 10px;
+  padding: 15px;
   position: relative;
 }
 
 .play-btn {
   position: absolute;
   top: -20px;
-  left: 10px;
+  left: 15px;
   background-color: var(--secondary-color);
   color: white;
   border: none;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.play-btn:hover {
+  background-color: var(--hover-color, #ffe100);
+  color: black;
 }
 
 .quiz-title {
-  font-size: 14px;
-  margin: 15px 0 5px;
+  font-size: 16px;
+  margin: 15px 0 8px;
 }
 
 .quiz-meta {
   display: flex;
   flex-direction: column;
-  font-size: 12px;
-  color: #777;
+  font-size: 13px;
+  color: #555;
 }
 
 /* Vote Section */
 .vote-section {
   background-color: var(--primary-color);
   color: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: var(--border-radius);
   margin-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .vote-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .vote-btn {
   background-color: var(--secondary-color);
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 20px;
+  font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
 .vote-btn:hover {
-  background-color: var(
-    --hover-color,
-    #ffe100
-  ); /* fallback nếu --hover-color chưa có */
+  background-color: var(--hover-color, #ffe100);
   color: black;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive styles */
@@ -211,22 +269,12 @@
   }
 
   .quiz-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
   .vote-content {
     flex-direction: column;
     text-align: center;
     gap: 15px;
-  }
-
-  .footer-top {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .footer-links {
-    flex-direction: column;
-    gap: 20px;
   }
 }

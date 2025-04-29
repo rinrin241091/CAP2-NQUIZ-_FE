@@ -1,19 +1,24 @@
 .footer {
   background-color: #fdfbf5;
-  padding: 20px 40px;
+  padding: 20px 40px; /* Giữ padding hiện tại */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .footer-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Giữ nguyên */
   align-items: flex-start;
   width: 100%;
   max-width: 1200px;
+  box-sizing: border-box;
+  padding: 0 20px; /* Thêm padding hai bên container */
 }
+
 .discord-text {
   font-size: 14px;
   color: #333;
