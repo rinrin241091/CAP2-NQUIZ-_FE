@@ -126,8 +126,14 @@ export default function MultipleCorrectAnswers() {
       </div>
 
       {/* Footer */}
-      <div className="multiple-footer">
-        <button className="btn-settings-multiple">Settings</button>
+      <div className="multiple-footer">        
+        <button
+          className="btn-settings-multiple"
+          type="button"
+          onClick={() => navigate("/quiz-settings")}
+        >
+          Settings
+        </button>
         <button className="btn-add-slide-multiple">+</button>
       </div>
     </div>

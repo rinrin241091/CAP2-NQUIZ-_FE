@@ -92,7 +92,13 @@ export default function OneCorrectAnswer() {
 
       {/* Footer */}
       <div className="one-footer">
-        <button className="btn-settings-one">Settings</button>
+        <button
+          className="btn-settings-one"
+          type="button"
+          onClick={() => navigate("/quiz-settings")}
+        >
+          Settings
+        </button>
         <button className="btn-add-slide-one">+</button>
       </div>
     </div>

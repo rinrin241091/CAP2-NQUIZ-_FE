@@ -20,6 +20,8 @@ import OneCorrectAnswer from "./components/OneCorrectAnswer";
 import MultipleCorrectAnswers from "./components/MultipleCorrectAnswers";
 import CreateQuiz from "./pages/CreateQuiz";
 import MyQuizzes from "./pages/MyQuizzes";
+import QuizSettingsPage from "./components/QuizSettingsPage";
+import WaitingRoomPage from "./components/WaitingRoomPage";
 
 function App() {
   return (
@@ -42,6 +44,8 @@ function App() {
           path="/multiple-correct-answers"
           element={<MultipleCorrectAnswers />}
         />
+        <Route path="/quiz-settings" element={<QuizSettingsPage />} />
+        <Route path="/waiting-room" element={<WaitingRoomPage />} />
 
         {/* Protected Routes */}
         <Route

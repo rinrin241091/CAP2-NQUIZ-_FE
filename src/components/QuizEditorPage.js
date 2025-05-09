@@ -81,7 +81,10 @@ export default function QuizEditorPage() {
       <div className="quiz-editor-header">
         <div className="quiz-editor-header-left">
           <img src="/logo.png" alt="Logo" className="logo" />
-          <button className="btn-back-editor" onClick={() => navigate("/create-quiz")}>
+          <button
+            className="btn-back-editor"
+            onClick={() => navigate("/create-quiz")}
+          >
             ← Back to Create Quiz
           </button>
         </div>
@@ -92,27 +95,35 @@ export default function QuizEditorPage() {
       </div>
 
       <div className="quiz-main-content">
-      <h1 className="quiz-editor-title">Add Slide</h1>
+        <h1 className="quiz-editor-title">Add Slide</h1>
 
-      <div className="slide-types-grid">
-        {slideTypes.map((slide, index) => (
-          <div
-            key={index}
-            className="slide-type-card"
-            onClick={() => handleSlideClick(slide.title)}
-          >
-            <div className="slide-icon">{slide.icon}</div>
-            <div>
-              <h2 className="slide-title">{slide.title}</h2>
-              <p className="slide-desc">{slide.desc}</p>
+        <div className="slide-types-grid">
+          {slideTypes.map((slide, index) => (
+            <div
+              key={index}
+              className="slide-type-card"
+              onClick={() => handleSlideClick(slide.title)}
+            >
+              <div className="slide-icon">{slide.icon}</div>
+              <div>
+                <h2 className="slide-title">{slide.title}</h2>
+                <p className="slide-desc">{slide.desc}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
       </div>
 
       <div className="quiz-editor-footer">
-        <button className="btn-settings-editor">Settings</button>
+        
+        <button
+          className="btn-settings-editor"
+          type="button"
+          onClick={() => navigate("/quiz-settings")}
+        >
+          Settings
+        </button>
+
         <button className="btn-add-slide-editor">+</button>
       </div>
     </div>
