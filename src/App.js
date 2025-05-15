@@ -22,12 +22,15 @@ import CreateQuiz from "./pages/CreateQuiz";
 import MyQuizzes from "./pages/MyQuizzes";
 import QuizSettingsPage from "./components/QuizSettingsPage";
 import WaitingRoomPage from "./components/WaitingRoomPage";
+import Test from "./components/test";
+import GameRoom from "./components/GameRoom";
 
 function App() {
   return (
     <div className="app">
       <Routes>
         {/* Public Routes */}
+        <Route path="/test" element={<Test />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/sports" element={<SportsPage />} />
@@ -45,7 +48,8 @@ function App() {
           element={<MultipleCorrectAnswers />}
         />
         <Route path="/quiz-settings" element={<QuizSettingsPage />} />
-        <Route path="/waiting-room" element={<WaitingRoomPage />} />
+        <Route path="/waiting-room/:roomId" element={<WaitingRoomPage />} />
+        <Route path="/game-room/:roomId" element={<GameRoom />} />
 
         {/* Protected Routes */}
         <Route
