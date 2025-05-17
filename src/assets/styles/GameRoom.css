@@ -126,3 +126,157 @@
     padding: 15px 20px;
   }
 }
+.winner{
+    font-size: 50px;
+}
+.game-final-report {
+  margin: 3rem auto;
+  background-color: #ffffff;
+  max-width: 600px; /* làm bảng rộng hơn */
+  border-radius: 20px; /* bo góc lớn hơn */
+  padding: 2.5rem 3rem; /* padding to hơn */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18); /* shadow sâu hơn */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222222;
+  border: 2px solid #3498db; /* viền xanh nổi bật */
+}
+
+.game-final-report h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.4rem; /* chữ to hơn */
+  font-weight: 800;
+  color: #2980b9;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.game-final-report table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 12px 8px; 
+}
+
+.game-final-report th,
+.game-final-report td {
+  padding: 20px 20px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #34495e;
+  background-color: #f7f9fc;
+  border-radius: 12px;
+  text-align: center;  
+}
+
+/* Tăng khoảng cách cột Player và Score */
+.game-final-report th:first-child,
+.game-final-report td:first-child {
+  min-width: 220px;       /* Chiều rộng tối thiểu */
+}
+
+.game-final-report th:last-child,
+.game-final-report td:last-child { 
+  min-width: 120px;       /* Chiều rộng tối thiểu */
+}
+
+.game-final-report thead th {
+  background-color: #3498db;
+  color: white;
+  font-weight: 700;
+  border-radius: 12px 12px 0 0; /* bo góc trên cho header */
+  border-bottom: 3px solid #2980b9;
+  letter-spacing: 0.12em;
+}
+
+.game-final-report tbody tr:hover td {
+  background-color: #d6eaf8;
+  transition: background-color 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .game-final-report {
+    max-width: 95%;
+    padding: 1.5rem 1.8rem;
+  }
+
+  .game-final-report h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .game-final-report th,
+  .game-final-report td {
+    padding: 14px 12px;
+    font-size: 1.1rem;
+  }
+}
+.back-home-btn {
+  margin-top: 2rem;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #3498db;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+/* Highlight đáp án đã chọn */
+.game-selected-highlight {
+  font-weight: 700; /* đậm hơn */
+  border: 2px solid #555;
+  box-shadow: 0 0 8px 3px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+      background-color: #38b2ac;
+    color: #ffffff;
+}
+
+/* Đáp án đúng */
+.game-correct {
+  background-color: #2ecc71 !important; /* xanh lá */
+  color: white !important;
+  box-shadow: 0 0 10px #27ae60;
+}
+
+/* Các style khác cho câu hỏi và lựa chọn */
+.game-options {
+  transition: background-color 0.3s ease;
+}
+
+.game-options:hover {
+  background-color: #3498db;
+}
+
+.game-options:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.game-ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.game-li {
+  margin-bottom: 10px;
+}
+
+.game-question-text {
+  font-size: 1.5rem;
+}
+.pause-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #ff6b6b;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.pause-btn:hover {
+  background-color: #ff4757;
+}

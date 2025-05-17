@@ -24,6 +24,7 @@ import QuizSettingsPage from "./components/QuizSettingsPage";
 import WaitingRoomPage from "./components/WaitingRoomPage";
 import Test from "./components/test";
 import GameRoom from "./components/GameRoom";
+import MyQuizz from "./pages/MyQuizz";
 
 function App() {
   return (
@@ -50,7 +51,7 @@ function App() {
         <Route path="/quiz-settings" element={<QuizSettingsPage />} />
         <Route path="/waiting-room/:roomId" element={<WaitingRoomPage />} />
         <Route path="/game-room/:roomId" element={<GameRoom />} />
-
+        <Route path="/my-quizz" element={<MyQuizz />} />
         {/* Protected Routes */}
         <Route
           path="/dashboard"

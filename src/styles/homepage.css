@@ -77,10 +77,14 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  padding: 0 50px;
   margin-bottom: 30px;
   width: 100%;
   box-sizing: border-box;
+  max-width: 100%; /* 👈 Chặn tràn ngang */
+  overflow-x: hidden; /* 👈 Phòng trường hợp ảnh lớn */
 }
+
 
 .hero-card {
   background-color: var(--primary-color);
@@ -103,8 +107,8 @@ body {
 }
 
 .hero-image {
-  max-width: 120px;
-  height: auto;
+  /* max-width: 200px; */
+    /* height: 200px; */
 }
 
 .hero-text {

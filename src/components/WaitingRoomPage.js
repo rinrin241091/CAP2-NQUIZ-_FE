@@ -1,12 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";  // Thêm useNavigate
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../assets/styles/WaitingRoomPage.css";
 import socket from "../socket";
+import { playQuiz } from "../services/api";
 
-export default function WaitingRoomPage({ roomId: propRoomId, players: initialPlayers = [], isHost }) {
+export default function WaitingRoomPage(props) {
+  const [showRoomId, setShowRoomId] = useState(true);
   const { roomId: urlRoomId } = useParams();
-  const roomId = propRoomId || urlRoomId;
-  const navigate = useNavigate(); // Khởi tạo navigate
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const roomId = props.roomId || urlRoomId;
+  const quizId = props.quizId || location.state?.quizId;
+  const isHost = props.isHost ?? location.state?.isHost;
+  const initialPlayers = props.players || location.state?.players || [];
 
   const [players, setPlayers] = useState(initialPlayers);
   const [maxWidth, setMaxWidth] = useState(0);
@@ -18,8 +25,26 @@ export default function WaitingRoomPage({ roomId: propRoomId, players: initialPl
     });
 
     socket.on("gameStarted", () => {
-      // Khi server báo game bắt đầu, chuyển trang sang màn chơi
-      navigate(`/game-room/${roomId}`);
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player) => ({ ...player, status: "playing" }))
+      );
+      navigate(`/game-room/${roomId}?isHost=${isHost}`);
+    });
+
+    socket.on("newQuestion", () => {
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player) => ({ ...player, status: "playing" }))
+      );
+      navigate(`/game-room/${roomId}?isHost=${isHost}`);
+    });
+
+    socket.on("currentQuestion", (questionData) => {
+      if (questionData) {
+        setPlayers((prevPlayers) =>
+          prevPlayers.map((player) => ({ ...player, status: "playing" }))
+        );
+        navigate(`/game-room/${roomId}?isHost=${isHost}`, { state: { question: questionData } });
+      }
     });
 
     if (roomId) {
@@ -29,8 +54,10 @@ export default function WaitingRoomPage({ roomId: propRoomId, players: initialPl
     return () => {
       socket.off("updatePlayers");
       socket.off("gameStarted");
+      socket.off("newQuestion");
+      socket.off("currentQuestion");
     };
-  }, [roomId, navigate]);
+  }, [roomId, navigate, isHost]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -46,30 +73,41 @@ export default function WaitingRoomPage({ roomId: propRoomId, players: initialPl
   const mid = Math.ceil(players.length / 2);
   const leftColumn = players.slice(0, mid);
   const rightColumn = players.slice(mid);
-
   const isTwoColumns = players.length > 8;
+  const playerStyle = maxWidth ? { width: maxWidth + 20 } : {};
 
-  const playerStyle = maxWidth ? { width: maxWidth + 20 } : {}; // +20 padding dự phòng
-
-  // Hàm xử lý nút start game
-  const handleStartGame = () => {
-    socket.emit("startGame", roomId);
+  const handleStartGame = async () => {
+    try {
+      console.log("Việt gửi khi bấm start:",quizId );
+      await playQuiz(quizId);
+      socket.emit("startGame", roomId);
+    } catch (error) {
+      console.error("Failed to update play count:", error);
+      alert("Failed to start the game. Please try again.");
+    }
   };
 
   return (
     <div className="waiting-wrapper">
       <div className="left-panel">
         <p className="waiting-pin-label">PIN code:</p>
-        <p className="waiting-pin-number">{roomId}</p>
-
+        {showRoomId ? (
+          <p className="waiting-pin-number">{roomId}</p>  
+        ) : (
+          <p className="waiting-pin-number">••••••</p>
+        )}
+        <button className="waiting-start-btn" onClick={() => (window.location.href = "http://localhost:3001")}>HomePage</button>
         <div className="waiting-pin-actions">
-          <button className="waiting-link-btn" onClick={() => navigator.clipboard.writeText(roomId)}>🔗 Copy</button>
-          <button className="waiting-link-btn" onClick={() => alert("Mã phòng đã bị ẩn!")}>🙈 Hide</button>
+          <button  className="waiting-link-btn" onClick={() => navigator.clipboard.writeText(roomId)}> 🔗 Copy  </button>
+          <button className="waiting-link-btn" onClick={() => setShowRoomId(!showRoomId)}> {showRoomId ? "🙈 Hide" : "👁️ Show"} </button>
         </div>
 
         <p className="waiting-text">Waiting for players</p>
 
-        <div className={`players-list ${isTwoColumns ? "two-columns" : ""}`} ref={containerRef}>
+        <div
+          className={`players-list ${isTwoColumns ? "two-columns" : ""}`}
+          ref={containerRef}
+        >
           {players.length === 0 ? (
             <p>No players have joined yet.</p>
           ) : isTwoColumns ? (
@@ -77,14 +115,16 @@ export default function WaitingRoomPage({ roomId: propRoomId, players: initialPl
               <div className="column">
                 {leftColumn.map((player, index) => (
                   <p key={index} className="player-name" style={playerStyle}>
-                    {player.name} {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                    {player.name}{" "}
+                    {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
                   </p>
                 ))}
               </div>
               <div className="column">
                 {rightColumn.map((player, index) => (
                   <p key={index} className="player-name" style={playerStyle}>
-                    {player.name} {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                    {player.name}{" "}
+                    {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
                   </p>
                 ))}
               </div>
@@ -92,7 +132,8 @@ export default function WaitingRoomPage({ roomId: propRoomId, players: initialPl
           ) : (
             players.map((player, index) => (
               <p key={index} className="player-name" style={playerStyle}>
-                {player.name} {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                {player.name}{" "}
+                {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
               </p>
             ))
           )}

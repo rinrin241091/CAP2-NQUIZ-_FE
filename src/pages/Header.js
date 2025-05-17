@@ -170,6 +170,10 @@ function Header() {
     navigate("/profile");
     handleSettingsClose();
   };
+    const handleMyQuizzesClick = () => {
+    navigate("/my-quizz");
+    handleSettingsClose();
+  };
 
   // Đăng xuất
   const handleLogout = () => {
@@ -182,7 +186,7 @@ function Header() {
   return (
     <header className="header">
       <div className="main-header">
-        <div className="logo">NQUIZ.com</div>
+        <div className="logo" onClick={() => navigate("/Home")} style={{ cursor: "pointer" }}>NQUIZ.com</div>
 
         {/* Hiển thị Input PIN để tham gia phòng */}
         <PinInput
@@ -211,6 +215,7 @@ function Header() {
             onClose={handleSettingsClose}
           >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+            <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
             {user?.role === "admin" && (
               <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
             )}

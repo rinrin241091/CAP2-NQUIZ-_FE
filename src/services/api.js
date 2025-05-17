@@ -81,4 +81,16 @@ export const createQuiz = (quizData) => api.post("/quizzes", quizData);
 export const updateQuiz = (id, quizData) => api.put(`/quizzes/${id}`, quizData);
 export const deleteQuiz = (id) => api.delete(`/quizzes/${id}`);
 
+//home page
+export const getHomePageQuizzes = () => api.get("/home-page/all");
+export const getHomePageQuizzesRadom = () => api.get("/home-page/random");
+export const getHomePagePopularQuizzes = () => api.get("/home-page/popular");
+export const getRecentlyPlayedQuizzes = () => api.get("/home-page/recently-played");
+
+
+export const playQuiz = (quizId) => api.post(`/question/${quizId}/play`);
+
+
+
+
 export default api;
