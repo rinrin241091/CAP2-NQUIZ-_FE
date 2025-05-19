@@ -1,39 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./HeaderMyquizz";
 import Footer from "../components/Footer";
 import "../styles/myquizz.css";
+import socket from "../socket";
+import { getQuizzesByUser } from "../services/api";
 
 function MyQuizz() {
+  const [quizzes, setQuizzes] = useState([]);
   const [showGame, setShowGame] = useState(false);
 
-  // Giả lập dữ liệu quiz (bạn nên thay bằng dữ liệu thực)
-  const entertainmentQuizzes = [
-    {
-      id: 1,
-      title: "Guess the Movie",
-      description: "Can you name these famous movies from one frame?",
-      image: "/images/movie-quiz.jpg",
-      plays: 1200,
-      likes: 250,
-      date: "2025-05-18",
-    },
-    {
-      id: 2,
-      title: "Pop Music Trivia",
-      image: "/images/music-quiz.jpg",
-      plays: 890,
-      likes: 180,
-      date: "2025-04-22",
-    },
-    {
-      id: 3,
-      title: "TV Show Quotes",
-      image: "/images/tv-quiz.jpg",
-      plays: 760,
-      likes: 140,
-      date: "2025-03-15",
-    },
-  ];
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const userId = localStorage.getItem("user_ID");
+        if (!userId) return console.error("User ID not found");
+
+        const res = await getQuizzesByUser(userId); // ✅ dùng API đã export
+        setQuizzes(res.data.data || []);
+      } catch (error) {
+        console.error("Failed to load quizzes:", error);
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
+    const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem("user"));
+    const name = user?.username || "Người chơi";
+    const handlePlayNow = (quizId) => {
+    socket.emit("createRoom", name, quizId);
+
+    socket.once("roomCreated", (roomId) => {
+    navigate(`/waiting-room/${roomId}`, {
+      state: {
+        quizId,
+        isHost: true,
+        playerName: name,
+      },
+    });
+  });
+};
+
 
   return (
     <div className="page-container">
@@ -51,9 +59,10 @@ function MyQuizz() {
             </select>
           </div>
         </div>
+
         <div className="quiz-list">
-          {entertainmentQuizzes.map((quiz) => (
-            <div key={quiz.id} className="quiz-item">
+          {quizzes.map((quiz) => (
+            <div key={quiz.quiz_id} className="quiz-item">
               <img
                 src={quiz.image}
                 alt={quiz.title}
@@ -62,11 +71,12 @@ function MyQuizz() {
               <div className="quiz-details">
                 <h3>{quiz.title}</h3>
                 <p>
-                  <span>Plays: {quiz.plays}</span> |{" "}
+                  <span>Plays: {quiz.play_count}</span> |{" "}
+                  <span>{quiz.create_date}</span>
                 </p>
                 <button
                   className="play-btn"
-                  onClick={() => setShowGame(true)}
+                  onClick={() => handlePlayNow(quiz.quiz_id)}
                 >
                   Play Now
                 </button>

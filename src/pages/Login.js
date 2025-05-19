@@ -62,6 +62,7 @@ const Login = () => {
       // Lưu token và user vào localStorage
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user_ID",user.user_id );
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("role", JSON.stringify(user.role));
 
@@ -183,7 +184,7 @@ const Login = () => {
       </Grid>
       <Box sx={{ mt: 4, textAlign: "center" }}>
         <Typography variant="body2" color="text.secondary">
-          Copyright NQuiz © 2024
+          Copyright NQuiz © 2025
         </Typography>
       </Box>
     </Container>

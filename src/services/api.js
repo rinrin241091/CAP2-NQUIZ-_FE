@@ -90,7 +90,7 @@ export const getRecentlyPlayedQuizzes = () => api.get("/home-page/recently-playe
 
 export const playQuiz = (quizId) => api.post(`/question/${quizId}/play`);
 
-
+export const getQuizzesByUser = (userId) => api.get(`/home-page/user/${userId}`);
 
 
 export default api;

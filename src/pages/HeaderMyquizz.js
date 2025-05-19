@@ -75,7 +75,7 @@ function Header() {
   };
 
   return (
-    <header className="header">
+    <header className="header-my-quizzes">
       <div className="main-header">
         <div className="logo" onClick={() => navigate("/Home")} style={{ cursor: "pointer" }}>
           NQUIZ.com
