@@ -72,30 +72,20 @@ body {
   flex-grow: 1; /* Cho phép main-content mở rộng để lấp đầy không gian còn lại */
 }
 
-/* Hero Section */
-.hero-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 0 50px;
-  margin-bottom: 30px;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 100%; /* 👈 Chặn tràn ngang */
-  overflow-x: hidden; /* 👈 Phòng trường hợp ảnh lớn */
-}
-
 
 .hero-card {
   background-color: var(--primary-color);
   color: white;
   border-radius: var(--border-radius);
-  padding: 20px;
   position: relative;
   overflow: hidden;
   width: 100%;
   height: auto;
   box-sizing: border-box;
+  padding: 0 40px;
+  margin-bottom: 30px;
+  max-width: 100%; /* 👈 Chặn tràn ngang */
+  overflow-x: hidden; /* 👈 Phòng trường hợp ảnh lớn */
 }
 
 .hero-content {
@@ -107,12 +97,14 @@ body {
 }
 
 .hero-image {
-  /* max-width: 200px; */
-    /* height: 200px; */
+  height: 300px;
+  width: 840px;
+  padding: 15px 0;
 }
 
 .hero-text {
   max-width: 60%;
+  margin-right: 100px;
 }
 
 .hero-text h2 {
@@ -123,6 +115,7 @@ body {
 .hero-text p {
   font-size: 14px;
   margin-bottom: 15px;
+  
 }
 
 .hero-btn {

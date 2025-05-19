@@ -108,7 +108,6 @@ function Navigation() {
 function HeroSection() {
   const navigate = useNavigate();
   return (
-    <section className="hero-section">
       <div className="hero-card create-quiz">
         <div className="hero-content">
           <img src="https://s3.ap-southeast-2.amazonaws.com/relux.cloude.com/chibi_student_canvas_430x300_hex_fee9c3.png" alt="Character" className="hero-image" />
@@ -121,17 +120,6 @@ function HeroSection() {
           </div>
         </div>
       </div>
-      <div className="hero-card ai-quiz">
-        <div className="hero-content">
-          <img src="https://s3.ap-southeast-2.amazonaws.com/relux.cloude.com/chibi_student_canvas_430x300_hex_fee9c3.png" alt="AI Character" className="hero-image" />
-          <div className="hero-text">
-            <h2>A.I.</h2>
-            <p>Generate a quiz from any subject or pdf</p>
-            <button className="hero-btn">Quiz generator</button>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
