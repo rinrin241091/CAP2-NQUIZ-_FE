@@ -92,7 +92,7 @@ function Header() {
   };
 
   const handleHomepageClick = () => {
-    navigate("/home");
+    navigate("/Home");
     handleSettingsClose();
   };
 
@@ -106,8 +106,13 @@ function Header() {
   return (
     <header className="header-dashboard">
       <div className="main-header-dashboard">
-        <div className="logo">NQUIZ Dashboard</div>
-
+        <div
+          className="logo"
+          onClick={() => navigate("/Home")}
+          style={{ cursor: "pointer" }}
+        >
+          NQUIZ Dashboard
+        </div>
         <div className="header-dashboard-buttons">
           <IconButton
             className="settings-btn-dashboard"

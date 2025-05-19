@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation  } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "../components/Footer";
 import "../styles/homepage.css";
@@ -12,7 +12,9 @@ import {
 
 function HomePage() {
   const [randomSelectionQuizzes, setRandomSelectionQuizzes] = useState([]);
-  const [popularAmongPeopleQuizzes, setPopularAmongPeopleQuizzes] = useState([]);
+  const [popularAmongPeopleQuizzes, setPopularAmongPeopleQuizzes] = useState(
+    []
+  );
   const [recentlyPlayedQuizzes, setRecentlyPlayedQuizzes] = useState([]);
 
   const location = useLocation();
@@ -43,8 +45,8 @@ function HomePage() {
     };
 
     if (location.pathname === "/" || location.pathname === "/Home") {
-    fetchAllQuizzes();
-  }
+      fetchAllQuizzes();
+    }
   }, [location.pathname]);
 
   return (
@@ -79,12 +81,12 @@ function Navigation() {
   const navigate = useNavigate();
   const navItems = [
     { icon: "🏠", label: "Home", path: "/Home" },
-    { icon: "🏆", label: "Leaderboard", path: "/leaderboard" },
-    { icon: "⭐", label: "Entertainment", path: "/entertainment" },
-    { icon: "🏠", label: "History", path: "/history" },
-    { icon: "🔍", label: "Languages", path: "/languages" },
-    { icon: "💰", label: "Science & Nature", path: "/sciencenature" },
-    { icon: "🎮", label: "Sports", path: "/sports" },
+    { icon: "➗", label: "Math", path: "/math" },
+    { icon: "🧲", label: "Physics", path: "/physical" },
+    { icon: "⚗️", label: "Chemistry", path: "/history" },
+    { icon: "📚", label: "Literature", path: "/languages" },
+    { icon: "🏛️", label: "History", path: "/sciencenature" },
+    { icon: "🗺️", label: "Geography", path: "/sports" },
   ];
 
   return (
@@ -108,18 +110,22 @@ function Navigation() {
 function HeroSection() {
   const navigate = useNavigate();
   return (
-      <div className="hero-card create-quiz">
-        <div className="hero-content">
-          <img src="https://s3.ap-southeast-2.amazonaws.com/relux.cloude.com/chibi_student_canvas_430x300_hex_fee9c3.png" alt="Character" className="hero-image" />
-          <div className="hero-text">
-            <h2>Create a quiz</h2>
-            <p>Play for free with 500 participants</p>
-            <button className="hero-btn" onClick={() => navigate("/create-quiz")}>
-              Quiz editor
-            </button>
-          </div>
+    <div className="hero-card create-quiz">
+      <div className="hero-content">
+        <img
+          src="https://s3.ap-southeast-2.amazonaws.com/relux.cloude.com/chibi_student_canvas_430x300_hex_fee9c3.png"
+          alt="Character"
+          className="hero-image"
+        />
+        <div className="hero-text">
+          <h2>Create a quiz</h2>
+          <p>Play for free with 500 participants</p>
+          <button className="hero-btn" onClick={() => navigate("/create-quiz")}>
+            Quiz editor
+          </button>
         </div>
       </div>
+    </div>
   );
 }
 

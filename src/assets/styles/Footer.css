@@ -20,7 +20,7 @@
 }
 
 .discord-text {
-  font-size: 14px;
+  font-size: 20px;
   color: #333;
 }
 .discord-section {
@@ -31,7 +31,7 @@
 }
 
 .discord-logo {
-  width: 50px;
+  width: 170px;
   margin-bottom: 10px;
 }
 
@@ -63,13 +63,13 @@
 }
 
 .footer-column h4 {
-  font-size: 16px;
+  font-size: 20px;
   margin-bottom: 10px;
   color: #333;
 }
 
 .footer-column a {
-  font-size: 14px;
+  font-size: 17px;
   color: #333;
   text-decoration: none;
   margin-bottom: 5px;
