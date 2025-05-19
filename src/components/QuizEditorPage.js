@@ -1,6 +1,6 @@
 // QuizEditorPage.js
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../assets/styles/QuizEditorPage.css";
 
 import {
@@ -61,6 +61,24 @@ const slideTypes = [
 
 export default function QuizEditorPage() {
   const navigate = useNavigate();
+  const { quizId } = useParams();
+
+  console.log('QuizEditorPage - quizId:', quizId);
+
+  const [questionTypes, setQuestionTypes] = useState([]);
+
+  useEffect(() => {
+    const fetchQuestionTypes = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/question-types");
+        const data = await res.json();
+        setQuestionTypes(Array.isArray(data) ? data : data.data || []);
+      } catch (err) {
+        setQuestionTypes([]);
+      }
+    };
+    fetchQuestionTypes();
+  }, []);
 
   const handleSlideClick = (slideType) => {
     if (slideType === "Buttons") {
@@ -95,22 +113,31 @@ export default function QuizEditorPage() {
       </div>
 
       <div className="quiz-main-content">
-        <h1 className="quiz-editor-title">Add Slide</h1>
-
+        <h1 className="quiz-editor-title">Chọn loại câu hỏi</h1>
         <div className="slide-types-grid">
-          {slideTypes.map((slide, index) => (
-            <div
-              key={index}
-              className="slide-type-card"
-              onClick={() => handleSlideClick(slide.title)}
-            >
-              <div className="slide-icon">{slide.icon}</div>
-              <div>
-                <h2 className="slide-title">{slide.title}</h2>
-                <p className="slide-desc">{slide.desc}</p>
+          {questionTypes.map((type) => {
+            const handleClick = () => {
+              if (type.question_type_id === 1) {
+                navigate(`/one-correct-answer/${quizId}`, { state: { quizId: quizId,questionTypeId: type.question_type_id } });
+              } else if (type.question_type_id === 2) {
+                navigate('/multiple-correct-answers', { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+              } else if (type.question_type_id === 3) {
+                navigate('/short-answer', { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+              } else {
+                alert('Chức năng này chưa hỗ trợ!');
+              }
+            };
+            return (
+              <div
+                key={type.question_type_id}
+                className="slide-type-card"
+                onClick={handleClick}
+              >
+                <div className="slide-title">{type.name}</div>
+                <div className="slide-desc">{type.description}</div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

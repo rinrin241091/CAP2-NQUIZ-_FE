@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../services/axiosConfig';
 import '../styles/CreateQuiz.css';
 
 const CreateQuiz = () => {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     is_public: true,
-    category_id: 1
+    category_id: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,9 +29,14 @@ const CreateQuiz = () => {
     setError('');
 
     try {
-      const response = await axiosInstance.post('/quizzes', formData);
-      if (response.data) {
-        navigate('/'); // Redirect to home page after successful creation
+      const response = await axiosInstance.post('/api/quizzes', formData);
+      console.log('CreateQuiz - API response:', response.data);
+      if (response.data && response.data.data && response.data.data.id) {
+        const quizId = response.data.data.id;
+        navigate(`/quiz-editor/${quizId}`); // Redirect to quiz editor with quizId
+      } else {
+        setError('Quiz created but no ID returned, or backend error.');
+        // Optional: navigate to a generic success page or stay here
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo quiz');
@@ -38,6 +44,32 @@ const CreateQuiz = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        const user = storedUser ? JSON.parse(storedUser) : null;
+        const user_id = user ? user.id : null;
+        const res = await axiosInstance.get('/categories', {
+          params: { user_id }
+        });
+        setCategories((res.data && Array.isArray(res.data.data)) ? res.data.data : []);
+      } catch (err) {
+        // Xử lý lỗi nếu cần
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    if (categories.length > 0 && !formData.category_id) {
+      setFormData(prev => ({
+        ...prev,
+        category_id: categories[0].id
+      }));
+    }
+  }, [categories]);
 
   return (
     <div className="create-quiz-container">
@@ -77,31 +109,31 @@ const CreateQuiz = () => {
           />
         </div>
 
-        {/* <div className="form-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              name="is_public"
-              checked={formData.is_public}
-              onChange={handleChange}
-            />
-            Công khai
-          </label>
-        </div>
-
         <div className="form-group">
           <label htmlFor="category_id">Danh mục:</label>
           <select
             id="category_id"
             name="category_id"
-            value={formData.category_id}
+            value={formData.category_id || ''}
             onChange={handleChange}
+            required
           >
-            <option value={1}>Danh mục 1</option>
-            <option value={2}>Danh mục 2</option>
-            <option value={3}>Danh mục 3</option>
+            <option value="" disabled>Chọn danh mục</option>
+            {categories.map(cat => (
+              <option key={cat.category_id} value={cat.category_id}>{cat.category_name}</option>
+            ))}
           </select>
-        </div> */}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="image">Ảnh Quiz:</label>
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+          />
+        </div>
 
         <button type="submit" disabled={loading}>
           {loading ? 'Đang tạo...' : 'Tạo Quiz'}

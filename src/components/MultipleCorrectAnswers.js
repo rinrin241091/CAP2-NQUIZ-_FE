@@ -1,10 +1,12 @@
 // MultipleCorrectAnswers.js
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/styles/MultipleCorrectAnswers.css";
 
 export default function MultipleCorrectAnswers() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const quizId = location.state?.quizId;
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState([
     { text: "", isCorrect: false },
@@ -26,7 +28,7 @@ export default function MultipleCorrectAnswers() {
       <div className="multiple-header">
         <div className="multiple-header-left">
           <img src="/logo.png" alt="Logo" className="logo" />
-          <button className="btn-back-multiple" onClick={() => navigate("/quiz-editor")}>
+          <button className="btn-back-multiple" onClick={() => navigate(`/quiz-editor/${quizId}`)}>
             ← Back to Quiz
           </button>
         </div>

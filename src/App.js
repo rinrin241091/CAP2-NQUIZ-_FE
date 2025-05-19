@@ -42,8 +42,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/quiz-editor" element={<QuizEditorPage />} />
-        <Route path="/one-correct-answer" element={<OneCorrectAnswer />} />
+        <Route path="/quiz-editor/:quizId" element={<QuizEditorPage />} />
+        <Route path="/one-correct-answer/:quizId" element={<OneCorrectAnswer />} />
         <Route
           path="/multiple-correct-answers"
           element={<MultipleCorrectAnswers />}
