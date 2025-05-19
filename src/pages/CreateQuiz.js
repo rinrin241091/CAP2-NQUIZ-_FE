@@ -30,9 +30,13 @@ const CreateQuiz = () => {
 
     try {
       const response = await axiosInstance.post('/api/quizzes', formData);
-      if (response.data) {
-        const quizId = response.data.data.quiz_id;
+      console.log('CreateQuiz - API response:', response.data);
+      if (response.data && response.data.data && response.data.data.id) {
+        const quizId = response.data.data.id;
         navigate(`/quiz-editor/${quizId}`); // Redirect to quiz editor with quizId
+      } else {
+        setError('Quiz created but no ID returned, or backend error.');
+        // Optional: navigate to a generic success page or stay here
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo quiz');

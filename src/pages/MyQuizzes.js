@@ -36,10 +36,10 @@ const MyQuizzes = () => {
         <ul className="my-quizzes-list">
            {quizzes.map((quiz, idx) => (
               <li
-                key={quiz.id}
+                key={quiz.quiz_id}
                 className="my-quizzes-item"
                 style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                onClick={() => navigate(`/quiz-editor/${quiz.id}`)}
+                onClick={() => navigate(`/quiz-editor/${quiz.quiz_id}`)}
               >
                 <span className="my-quizzes-item-index">Quiz {idx + 1}:</span>
                 <span className="my-quizzes-item-title" style={{ flex: 1, marginLeft: 8 }}>{quiz.title}</span>

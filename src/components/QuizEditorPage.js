@@ -63,6 +63,8 @@ export default function QuizEditorPage() {
   const navigate = useNavigate();
   const { quizId } = useParams();
 
+  console.log('QuizEditorPage - quizId:', quizId);
+
   const [questionTypes, setQuestionTypes] = useState([]);
 
   useEffect(() => {
@@ -113,16 +115,29 @@ export default function QuizEditorPage() {
       <div className="quiz-main-content">
         <h1 className="quiz-editor-title">Chọn loại câu hỏi</h1>
         <div className="slide-types-grid">
-          {questionTypes.map((type) => (
-            <div
-              key={type.question_type_id}
-              className="slide-type-card"
-              // onClick={() => ...} // Có thể thêm sự kiện khi chọn loại câu hỏi
-            >
-              <div className="slide-title">{type.name}</div>
-              <div className="slide-desc">{type.description}</div>
-            </div>
-          ))}
+          {questionTypes.map((type) => {
+            const handleClick = () => {
+              if (type.question_type_id === 1) {
+                navigate(`/one-correct-answer/${quizId}`, { state: { quizId: quizId,questionTypeId: type.question_type_id } });
+              } else if (type.question_type_id === 2) {
+                navigate('/multiple-correct-answers', { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+              } else if (type.question_type_id === 3) {
+                navigate('/short-answer', { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+              } else {
+                alert('Chức năng này chưa hỗ trợ!');
+              }
+            };
+            return (
+              <div
+                key={type.question_type_id}
+                className="slide-type-card"
+                onClick={handleClick}
+              >
+                <div className="slide-title">{type.name}</div>
+                <div className="slide-desc">{type.description}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
