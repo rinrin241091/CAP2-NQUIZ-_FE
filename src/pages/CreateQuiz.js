@@ -9,12 +9,14 @@ const CreateQuiz = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    is_public: true,
+    is_public: 1,
     category_id: ''
   });
+  const [imageFile, setImageFile] = useState(null); // ✅ ảnh
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // ✅ Gán giá trị input vào state
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -23,20 +25,33 @@ const CreateQuiz = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await axiosInstance.post('/api/quizzes', formData);
+      // ✅ Tạo formData để gửi dạng multipart/form-data
+      const data = new FormData();
+      data.append('title', formData.title);
+      data.append('description', formData.description);
+      data.append('is_public', formData.is_public);
+      data.append('category_id', formData.category_id);
+      if (imageFile) {
+        data.append('image', imageFile); // ✅ ảnh gửi lên backend
+      }
+
+      const response = await axiosInstance.post('/api/quizzes', data);
       console.log('CreateQuiz - API response:', response.data);
       if (response.data && response.data.data && response.data.data.id) {
         const quizId = response.data.data.id;
-        navigate(`/quiz-editor/${quizId}`); // Redirect to quiz editor with quizId
+        navigate(`/quiz-editor/${quizId}`);
       } else {
         setError('Quiz created but no ID returned, or backend error.');
-        // Optional: navigate to a generic success page or stay here
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo quiz');
@@ -56,7 +71,7 @@ const CreateQuiz = () => {
         });
         setCategories((res.data && Array.isArray(res.data.data)) ? res.data.data : []);
       } catch (err) {
-        // Xử lý lỗi nếu cần
+        console.error('Lỗi khi lấy danh mục:', err);
       }
     };
     fetchCategories();
@@ -66,7 +81,7 @@ const CreateQuiz = () => {
     if (categories.length > 0 && !formData.category_id) {
       setFormData(prev => ({
         ...prev,
-        category_id: categories[0].id
+        category_id: categories[0].category_id
       }));
     }
   }, [categories]);
@@ -82,8 +97,8 @@ const CreateQuiz = () => {
         Danh sách quiz
       </button>
       {error && <div className="error-message">{error}</div>}
-      
-      <form onSubmit={handleSubmit} className="quiz-form">
+
+      <form onSubmit={handleSubmit} className="quiz-form" encType="multipart/form-data">
         <div className="form-group">
           <label htmlFor="title">Tiêu đề:</label>
           <input
@@ -132,6 +147,7 @@ const CreateQuiz = () => {
             id="image"
             name="image"
             accept="image/*"
+            onChange={handleFileChange}
           />
         </div>
 

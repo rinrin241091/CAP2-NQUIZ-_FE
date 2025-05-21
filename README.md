@@ -27,7 +27,7 @@ This is the frontend application for NQuiz, a quiz management system.
    ```
 4. Create a `.env` file in the root directory and add the following:
    ```
-   REACT_APP_API_URL=http://localhost:3000
+   REACT_APP_API_URL=https://cap2-nquiz-fe.onrender.com
    ```
 
 ## Running the Application
@@ -38,7 +38,7 @@ To start the development server:
 npm start
 ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `https://cap2-nquiz-fe.onrender.com`
 
 ## Building for Production
 
