@@ -93,4 +93,9 @@ export const playQuiz = (quizId) => api.post(`/question/${quizId}/play`);
 export const getQuizzesByUser = (userId) => api.get(`/home-page/user/${userId}`);
 
 
+export const getTotalUsers = () => api.get('/api/dashboard/total-users');
+export const getTotalQuizzes = () => api.get('/api/dashboard/total-quizzes');
+export const getTotalPlays = () => api.get('/api/dashboard/total-plays');
+export const getChartData = (range) => api.get(`/api/dashboard/chart-data?range=${range}`);
+
 export default api;
