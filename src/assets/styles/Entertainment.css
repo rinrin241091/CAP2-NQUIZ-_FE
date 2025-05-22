@@ -73,7 +73,6 @@
 
 .play-now-btn {
   padding: 12px 24px;
-  background-color: #e91e63;
   color: white;
   border: none;
   border-radius: 25px;
@@ -83,7 +82,6 @@
 }
 
 .play-now-btn:hover {
-  background-color: #c2185b;
   transform: translateY(-2px);
 }
 
@@ -130,7 +128,6 @@
 .play-btn {
   width: 90%;
   padding: 8px 16px;
-  background-color: #e91e63;
   color: white;
   border: none;
   border-radius: 20px;
@@ -138,9 +135,6 @@
   transition: background-color 0.3s ease;
 }
 
-.play-btn:hover {
-  background-color: #c2185b;
-}
 
 .game-container {
   max-width: 1000px;

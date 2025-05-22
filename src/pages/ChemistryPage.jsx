@@ -3,26 +3,26 @@ import { useNavigate } from "react-router-dom";
 import Header from "./HeaderMyquizz";
 import Footer from "../components/Footer";
 import "../assets/styles/Entertainment.css";
-import { getHistory, getQuizzesSocket } from "../services/api";
+import { getChemistry, getQuizzesSocket } from "../services/api";
 import socket from "../socket";
 
-function HistoryPage() {
-  const [history, setHistory] = useState([]);
+function ChemistryPage() {
+  const [chemistry, setChemistry] = useState([]);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const name = user?.username || "Người chơi";
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    const fetchChemistry = async () => {
       try {
-        const res = await getHistory(); // ✅ gọi hàm đúng cách
-        setHistory(res.data.data || []);
+        const res = await getChemistry(); // ✅ gọi hàm đúng cách
+        setChemistry(res.data.data || []);
       } catch (error) {
         console.error("Failed to load quizzes:", error);
       }
     };
 
-    fetchHistory();
+    fetchChemistry();
   }, []);
 
 const handlePlayNow = async (quizId) => {
@@ -58,7 +58,7 @@ const handlePlayNow = async (quizId) => {
       <Header />
       <main className="main-content">
         <div className="category-header">
-          <h1>History Quizzes</h1>
+          <h1>Chemistry Quizzes</h1>
           <div className="filter-dropdown">
             <label htmlFor="filter">Sort by:</label>
             <select id="filter" defaultValue="Best match">
@@ -72,7 +72,7 @@ const handlePlayNow = async (quizId) => {
         </div>
 
         <div className="quiz-list">
-          {history.map((quiz) => (
+          {chemistry.map((quiz) => (
             <div key={quiz.quiz_id} className="quiz-item">
               <img
                 src={quiz.image}
@@ -102,4 +102,4 @@ const handlePlayNow = async (quizId) => {
   );
 }
 
-export default HistoryPage;
+export default ChemistryPage;

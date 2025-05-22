@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../assets/styles/GameRoom.css";
 import socket from "../socket";
+import { saveGameResults } from "../services/api";
 
 export default function GameRoom() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  // Chỉ host khi giá trị isHost là "true"
   const isHost = queryParams.get("isHost") === "true";
 
   const { roomId } = useParams();
   const [question, setQuestion] = useState("");
+  const [questionType, setQuestionType] = useState("");
   const [options, setOptions] = useState([]);
   const [answered, setAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
+  const [selectedMultiAnswers, setSelectedMultiAnswers] = useState([]);
   const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
+  const [correctAnswers, setCorrectAnswers] = useState([]);
   const [allAnswered, setAllAnswered] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [scores, setScores] = useState([]);
@@ -22,60 +25,68 @@ export default function GameRoom() {
   const [winner, setWinner] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [shortAnswerText, setShortAnswerText] = useState("");
+  const [allResponses, setAllResponses] = useState([]);
+  const { state } = useLocation();
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const quizId = state?.quizId || null;
 
   useEffect(() => {
     socket.on("newQuestion", (data) => {
       setQuestion(data.question);
       setOptions(data.answers);
+      setQuestionType(data.question_type);
       setAnswered(false);
       setSelectedAnswerIndex(null);
+      setSelectedMultiAnswers([]);
       setCorrectAnswerIndex(null);
+      setCorrectAnswers([]);
       setAllAnswered(false);
-      setSeconds(data.timer);
+      setSeconds(data.time_limit || data.timer || 10);
       setStartTime(Date.now());
       setIsPaused(false);
+      setShortAnswerText("");
     });
 
     socket.on("answerResult", (data) => {
       setScores(data.scores);
       setCorrectAnswerIndex(data.correctAnswer);
-
-      setFinalScores((prevFinalScores) => {
-        const updatedScores = [...prevFinalScores];
+      setCorrectAnswers(data.correctAnswers || []);
+      setFinalScores((prev) => {
+        const updated = [...prev];
         data.scores.forEach((newPlayer) => {
-          const idx = updatedScores.findIndex((p) => p.name === newPlayer.name);
+          const idx = updated.findIndex((p) => p.name === newPlayer.name);
           if (idx !== -1) {
-            updatedScores[idx].score = newPlayer.score;
+            updated[idx].score = newPlayer.score;
           } else {
-            updatedScores.push({ name: newPlayer.name, score: newPlayer.score });
+            updated.push({ name: newPlayer.name, score: newPlayer.score });
           }
         });
-        return updatedScores;
+        return updated;
       });
-
       setAllAnswered(true);
-
-      setTimeout(() => {
-        setCorrectAnswerIndex(null);
-        setAnswered(false);
-        setSelectedAnswerIndex(null);
-        setAllAnswered(false);
-        // Không reset isPaused ở đây để nếu host đã pause thì game vẫn ở trạng thái pause
-      }, 3000);
+      // ❌ BỎ reset lại trạng thái sau 3s – không cần thiết
     });
 
-    socket.on("gameOver", (data) => {
+    socket.on("gameOver", async (data) => {
       setWinner(data.winner);
       setFinalScores(data.scores ?? finalScores);
       setIsPaused(true);
+      try {
+        await saveGameResults({
+          quizId,
+          hostId: user?.user_id,
+          roomPin: roomId,
+          players: data.scores.map((p) => ({ name: p.name, score: p.score })),
+          responses: allResponses
+        });
+      } catch (err) {
+        console.error("❌ Failed to save game results:", err);
+      }
     });
 
-    // Lắng nghe sự kiện pause/resume từ server để đồng bộ trạng thái trên client
-    socket.on("gamePaused", () => {
-      setIsPaused(true);
-    });
-
+    socket.on("gamePaused", () => setIsPaused(true));
     socket.on("gameResumed", () => {
       setIsPaused(false);
       setStartTime(Date.now());
@@ -92,69 +103,180 @@ export default function GameRoom() {
       socket.off("gamePaused");
       socket.off("gameResumed");
     };
-  }, [roomId, finalScores]);
+  }, [roomId, finalScores, allResponses]);
 
   useEffect(() => {
     if (seconds === 0 || isPaused) return;
-    const timerId = setInterval(() => {
-      setSeconds((sec) => sec - 1);
-    }, 1000);
+    const timerId = setInterval(() => setSeconds((sec) => sec - 1), 1000);
     return () => clearInterval(timerId);
   }, [seconds, isPaused]);
 
-  const handleAnswer = (index) => {
+  const handleSingleChoice = (index) => {
     if (answered) return;
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setSelectedAnswerIndex(index);
-    socket.emit("submitAnswer", roomId, index, timeTaken);
     setAnswered(true);
+    setAllResponses((prev) => [
+      ...prev,
+      {
+        playerName: user?.username,
+        questionText: question,
+        answerIndex: index,
+        timeTaken
+      }
+    ]);
+    socket.emit("submitAnswer", roomId, index, timeTaken);
   };
 
-  const handleBackHome = () => {
-    navigate("/Home");
+  const handleMultipleChoiceToggle = (index) => {
+    if (answered) return;
+    setSelectedMultiAnswers((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
   };
+
+  const handleSubmitMultipleChoice = () => {
+    if (answered || selectedMultiAnswers.length === 0) return;
+    const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+    setAnswered(true);
+    setAllResponses((prev) => [
+      ...prev,
+      {
+        playerName: user?.username,
+        questionText: question,
+        answerIndices: selectedMultiAnswers,
+        timeTaken
+      }
+    ]);
+    socket.emit("submitMultipleAnswers", roomId, selectedMultiAnswers, timeTaken);
+  };
+
+  const handleSubmitShortAnswer = () => {
+    if (answered || !shortAnswerText.trim()) return;
+    const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+    setAnswered(true);
+    setAllResponses((prev) => [
+      ...prev,
+      {
+        playerName: user?.username,
+        questionText: question,
+        answerText: shortAnswerText.trim(),
+        timeTaken
+      }
+    ]);
+    socket.emit("submitShortAnswer", roomId, shortAnswerText.trim(), timeTaken);
+  };
+
+  const handleBackHome = () => navigate("/Home");
 
   const togglePause = () => {
     if (!isHost) return;
-    if (isPaused) {
-      setIsPaused(false);
-      socket.emit("resumeGame", roomId);
-    } else {
-      setIsPaused(true);
-      socket.emit("pauseGame", roomId);
+    socket.emit(isPaused ? "resumeGame" : "pauseGame", roomId);
+    setIsPaused(!isPaused);
+  };
+
+  const renderOptions = () => {
+    if (questionType === "Short Answer") {
+      return (
+        <div className="short-answer-input">
+          <input
+            type="text"
+            value={shortAnswerText}
+            onChange={(e) => setShortAnswerText(e.target.value)}
+            placeholder="Enter your answer..."
+            disabled={answered}
+          />
+          <button
+            className="multi-submit-btn"
+            onClick={handleSubmitShortAnswer}
+            disabled={answered || !shortAnswerText.trim()}
+          >
+            Submit
+          </button>
+        </div>
+      );
     }
+
+    if (questionType === "Multiple Choice") {
+      return (
+        <>
+          <ul className="game-ul">
+            {options.map((answer, idx) => {
+              let className = "game-options";
+              if (correctAnswers.includes(idx)) className += " game-correct";
+              if (selectedMultiAnswers.includes(idx)) className += " game-selected-highlight";
+              return (
+                <li key={idx} className="game-li">
+                  <button
+                    className={className}
+                    onClick={() => handleMultipleChoiceToggle(idx)}
+                    disabled={answered}
+                  >
+                    {answer.text}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <button
+            className="multi-submit-btn"
+            onClick={handleSubmitMultipleChoice}
+            disabled={answered || selectedMultiAnswers.length === 0}
+          >
+            Submit Answer
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <ul className="game-ul">
+        {options.map((answer, idx) => {
+          let className = "game-options";
+          if (correctAnswerIndex === idx) className += " game-correct";
+          if (selectedAnswerIndex === idx) className += " game-selected-highlight";
+          return (
+            <li key={idx} className="game-li">
+              <button
+                className={className}
+                onClick={() => handleSingleChoice(idx)}
+                disabled={answered}
+              >
+                {answer.text}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
   };
 
   if (winner) {
     return (
       <div id="game-root">
-        <h1>🎉 Winner is {winner} 🎉</h1>
-        {finalScores.length > 0 ? (
-          <div className="game-final-report">
-            <h2>Final Scores</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>Score</th>
+        <h1 className="winner">🎉 Winner is {winner} 🎉</h1>
+        <div className="game-final-report">
+          <h2>Final Scores</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {finalScores.map((player, idx) => (
+                <tr key={idx}>
+                  <td>{player.name}</td>
+                  <td>{player.score}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {finalScores.map((player, idx) => (
-                  <tr key={idx}>
-                    <td>{player.name}</td>
-                    <td>{player.score}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <button className="back-home-btn" onClick={handleBackHome}>
-              Back to Home
-            </button>
-          </div>
-        ) : (
-          <p>No final scores available.</p>
-        )}
+              ))}
+            </tbody>
+          </table>
+          <button className="back-home-btn" onClick={handleBackHome}>
+            Back to Home
+          </button>
+        </div>
       </div>
     );
   }
@@ -164,47 +286,21 @@ export default function GameRoom() {
       <div className="game-quiz-div">
         <p className="game-remaining-time">⏳ Remaining Time: {seconds}s</p>
         {isHost && (
-          <button
-            className="pause-btn"
-            onClick={togglePause}
-            type="button"
-            style={{ marginBottom: "10px" }}
-          >
+          <button className="pause-btn" onClick={togglePause}>
             {isPaused ? "▶️ Resume" : "⏸ Pause"}
           </button>
         )}
         <div className="game-question">
           <p className="game-question-text">{question}</p>
         </div>
-        <ul className="game-ul">
-          {options.map((answer, idx) => {
-            let className = "game-options";
-            if (correctAnswerIndex === idx) {
-              className += " game-correct";
-            }
-            if (selectedAnswerIndex === idx && (answered || !allAnswered)) {
-              className += " game-selected-highlight";
-            }
-            return (
-              <li key={idx} className="game-li">
-                <button
-                  className={className}
-                  onClick={() => handleAnswer(idx)}
-                  disabled={answered && allAnswered}
-                >
-                  {answer.text}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-        <div className="game-scores">
+        {renderOptions()}
+        {/* <div className="game-scores">
           {scores.map((player, idx) => (
             <p key={idx}>
               {player.name}: {player.score}
             </p>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

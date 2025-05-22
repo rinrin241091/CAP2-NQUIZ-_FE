@@ -1,0 +1,113 @@
+.quiz-review-root {
+  width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-y: auto;
+}
+
+.quiz-review-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 24px;
+}
+
+.quiz-review-no-data {
+  font-size: 1.2rem;
+  color: #888;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.quiz-review-question {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-review-question p {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.quiz-review-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiz-review-li {
+  width: 100%;
+}
+
+.quiz-review-option {
+  width: 100%;
+  padding: 18px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  text-align: left;
+  background-color: #d7f7f9;
+  color: #2c3e50;
+  cursor: default;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.quiz-review-option.correct {
+  background-color: #2ecc71 !important;
+  color: white !important;
+  box-shadow: 0 0 10px #27ae60;
+}
+
+.quiz-review-option.incorrect {
+  background-color: #e74c3c !important;
+  color: white !important;
+  box-shadow: 0 0 10px #c0392b;
+}
+.session-select {
+  margin: 20px 0;
+  font-weight: 600;
+}
+
+.session-select select {
+  padding: 8px 16px;
+  margin-left: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+
+/* Responsive */
+@media (max-width: 480px) {
+  .quiz-review-root {
+    padding: 20px 16px;
+  }
+
+  .quiz-review-question {
+    padding: 20px;
+  }
+
+  .quiz-review-option {
+    font-size: 1rem;
+    padding: 14px 18px;
+  }
+}

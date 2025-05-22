@@ -3,11 +3,14 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/HomePage";
-import SportsPage from "./pages/SportsPage";
-import EntertainmentPage from "./pages/EntertainmentPage";
+
+import MathPage from "./pages/MathPage";
 import HistoryPage from "./pages/HistoryPage";
-import LanguagesPage from "./pages/LanguagesPage";
-import ScienceNaturePage from "./pages/ScienceNaturePage";
+import LiteraturePage from "./pages/LiteraturePage";
+import GeographyPage from "./pages/GeographyPage";
+import PhysicsPage from "./pages/PhysicsPage";
+import ChemistryPage from "./pages/ChemistryPage";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -25,6 +28,11 @@ import WaitingRoomPage from "./components/WaitingRoomPage";
 import Test from "./components/test";
 import GameRoom from "./components/GameRoom";
 import MyQuizz from "./pages/MyQuizz";
+import HistoryQuizzes from "./pages/HistoryQuizzes";
+import QuizReview from './pages/QuizReview'; // hoặc đúng path file bạn tạo
+
+
+
 
 function App() {
   return (
@@ -34,11 +42,14 @@ function App() {
         <Route path="/test" element={<Test />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/sports" element={<SportsPage />} />
-        <Route path="/entertainment" element={<EntertainmentPage />} />
+
+        <Route path="/math" element={<MathPage />} />
         <Route path="/history" element={<HistoryPage />} />
-        <Route path="/languages" element={<LanguagesPage />} />
-        <Route path="/sciencenature" element={<ScienceNaturePage />} />
+        <Route path="/physical" element={<PhysicsPage />} />
+        <Route path="/chemistry" element={<ChemistryPage />} />
+        <Route path="/literature" element={<LiteraturePage />} />
+        <Route path="/geography" element={<GeographyPage />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -52,6 +63,8 @@ function App() {
         <Route path="/waiting-room/:roomId" element={<WaitingRoomPage />} />
         <Route path="/game-room/:roomId" element={<GameRoom />} />
         <Route path="/my-quizz" element={<MyQuizz />} />
+        <Route path="/history-quizzes" element={<HistoryQuizzes />} />
+        <Route path="/quiz-review/:quizId" element={<QuizReview />} />
         {/* Protected Routes */}
         <Route
           path="/dashboard"

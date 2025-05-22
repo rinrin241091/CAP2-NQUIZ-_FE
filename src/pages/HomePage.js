@@ -8,6 +8,7 @@ import {
   getHomePageQuizzesRadom,
   getRecentlyPlayedQuizzes,
   getHomePagePopularQuizzes,
+  getQuizzesSocket,
 } from "../services/api";
 
 function HomePage() {
@@ -83,10 +84,10 @@ function Navigation() {
     { icon: "🏠", label: "Home", path: "/Home" },
     { icon: "➗", label: "Math", path: "/math" },
     { icon: "🧲", label: "Physics", path: "/physical" },
-    { icon: "⚗️", label: "Chemistry", path: "/history" },
-    { icon: "📚", label: "Literature", path: "/languages" },
-    { icon: "🏛️", label: "History", path: "/sciencenature" },
-    { icon: "🗺️", label: "Geography", path: "/sports" },
+    { icon: "⚗️", label: "Chemistry", path: "/chemistry" },
+    { icon: "📚", label: "Literature", path: "/literature" },
+    { icon: "🏛️", label: "History", path: "/history" },
+    { icon: "🗺️", label: "Geography", path: "/geography" },
   ];
 
   return (
@@ -119,7 +120,6 @@ function HeroSection() {
         />
         <div className="hero-text">
           <h2>Create a quiz</h2>
-          <p>Play for free with 500 participants</p>
           <button className="hero-btn" onClick={() => navigate("/create-quiz")}>
             Quiz editor
           </button>
@@ -148,21 +148,36 @@ function QuizCard({ quiz, buttonText }) {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const name = user?.username || "Người chơi";
-  const handlePlayNow = () => {
-    const quizId = quiz.id;
 
-    socket.emit("createRoom", name, quizId);
+  const handlePlayNow = async () => {
+  const quizId = quiz.id;
 
-    socket.once("roomCreated", (roomId) => {
-      navigate(`/waiting-room/${roomId}`, {
-        state: {
-          quizId,
-          isHost: true,
-          playerName: name,
-        },
+  try {
+    const res = await getQuizzesSocket(quizId);
+    if (res.data.success && res.data.data.length > 0) {
+      const questions = res.data.data;
+      console.log("🧪 FE gửi questions vào socket:", questions);
+
+      // Gửi quizId + questions vào socket để tạo room
+      socket.emit("createRoom", name, quizId, questions);
+
+      socket.once("roomCreated", (roomId) => {
+        navigate(`/waiting-room/${roomId}`, {
+          state: {
+            quizId,
+            isHost: true,
+            playerName: name,
+          },
+        });
       });
-    });
-  };
+    } else {
+      alert("❌ Quiz này chưa có câu hỏi nào!");
+    }
+  } catch (err) {
+    console.error("Lỗi khi lấy câu hỏi:", err);
+    alert("❌ Lỗi khi tạo phòng chơi!");
+  }
+};
 
   return (
     <div className="quiz-card">

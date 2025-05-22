@@ -28,14 +28,24 @@ export default function WaitingRoomPage(props) {
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) => ({ ...player, status: "playing" }))
       );
-      navigate(`/game-room/${roomId}?isHost=${isHost}`);
+      navigate(`/game-room/${roomId}?isHost=${isHost}`, {
+        state: {
+          quizId, // 👈 truyền quizId sang GameRoom
+        },
+      });
+
     });
 
     socket.on("newQuestion", () => {
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) => ({ ...player, status: "playing" }))
       );
-      navigate(`/game-room/${roomId}?isHost=${isHost}`);
+      navigate(`/game-room/${roomId}?isHost=${isHost}`, {
+        state: {
+          quizId, // 👈 truyền quizId sang GameRoom
+        },
+      });
+
     });
 
     socket.on("currentQuestion", (questionData) => {

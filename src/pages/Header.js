@@ -174,6 +174,11 @@ function Header() {
     navigate("/my-quizz");
     handleSettingsClose();
   };
+  const handleHistoryClick = () => {
+    navigate("/history-quizzes");
+    handleSettingsClose();
+  }
+  
 
   // Đăng xuất
   const handleLogout = () => {
@@ -216,6 +221,7 @@ function Header() {
           >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
             <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
+            <MenuItem onClick={handleHistoryClick}>History</MenuItem>
             {user?.role === "admin" && (
               <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
             )}
