@@ -94,6 +94,7 @@ export default function GameRoom() {
 
     if (roomId) {
       socket.emit("getPlayers", roomId);
+      socket.emit("requestCurrentQuestion", roomId);
     }
 
     return () => {
