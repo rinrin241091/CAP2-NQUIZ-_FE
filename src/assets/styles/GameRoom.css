@@ -113,6 +113,19 @@
   box-shadow: 0 0 10px #27ae60;
 }
 
+/* ✅ Giữ style khi đã chọn và bị disable */
+.game-options.game-selected-highlight:disabled {
+  background-color: #38b2ac !important;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.game-options.game-correct:disabled {
+  background-color: #2ecc71 !important;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
 /* Điểm số */
 .game-scores {
   margin-top: 40px;

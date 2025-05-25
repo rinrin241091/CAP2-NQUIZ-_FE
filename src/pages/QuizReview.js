@@ -13,7 +13,6 @@ export default function QuizResultView() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [questions, setQuestions] = useState([]);
 
-  // Fetch danh sách các lần chơi
   useEffect(() => {
     const fetchSessions = async () => {
       try {
@@ -34,7 +33,6 @@ export default function QuizResultView() {
     }
   }, [quizId, user?.user_id]);
 
-  // Fetch review theo session
   useEffect(() => {
     const fetchReview = async () => {
       if (!selectedSession) return;
@@ -86,9 +84,14 @@ export default function QuizResultView() {
             <ul className="quiz-review-ul">
               {q.answers.map((ans) => {
                 let className = "quiz-review-option";
-                const isUserAnswer = ans.answer_id === q.user_answer_id;
-                if (ans.correct) className += " correct";
-                if (isUserAnswer && !ans.correct) className += " incorrect";
+                const isUserAnswer = Number(ans.answer_id) === Number(q.user_answer_id);
+
+                if (isUserAnswer && !ans.correct) {
+                  className += " incorrect";
+                } else if (ans.correct) {
+                  className += " correct";
+                }
+
                 return (
                   <li key={ans.answer_id} className="quiz-review-li">
                     <button className={className} disabled>

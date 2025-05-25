@@ -6,10 +6,13 @@ import { saveGameResults } from "../services/api";
 
 export default function GameRoom() {
   const location = useLocation();
+  const { state } = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const isHost = queryParams.get("isHost") === "true";
 
+  const quizIdRef = useRef(state?.quizId || null);
   const { roomId } = useParams();
+  const responseRef = useRef([]);
   const [question, setQuestion] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [options, setOptions] = useState([]);
@@ -27,16 +30,19 @@ export default function GameRoom() {
   const [isPaused, setIsPaused] = useState(false);
   const [shortAnswerText, setShortAnswerText] = useState("");
   const [allResponses, setAllResponses] = useState([]);
-  const { state } = useLocation();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  const quizId = state?.quizId || null;
   const receivedQuestionRef = useRef(null);
+
+  const emitResponse = (response) => {
+    setAllResponses((prev) => [...prev, response]);
+  };
 
   useEffect(() => {
     socket.on("newQuestion", (data) => {
       if (receivedQuestionRef.current === data.question) return;
       receivedQuestionRef.current = data.question;
+      quizIdRef.current = data.quizId || quizIdRef.current;
       setQuestion(data.question);
       setOptions(data.answers);
       setQuestionType(data.question_type);
@@ -69,24 +75,29 @@ export default function GameRoom() {
         return updated;
       });
       setAllAnswered(true);
-      // ❌ BỎ reset lại trạng thái sau 3s – không cần thiết
     });
 
     socket.on("gameOver", async (data) => {
       setWinner(data.winner);
       setFinalScores(data.scores ?? finalScores);
       setIsPaused(true);
+      const quizId = quizIdRef.current;
+      if (!quizId) {
+        console.warn("⚠️ Không có quizId, bỏ qua lưu kết quả");
+        return;
+      }
       try {
         await saveGameResults({
           quizId,
           hostId: user?.user_id,
           roomPin: roomId,
           players: data.scores.map((p) => ({ name: p.name, score: p.score })),
-          responses: allResponses
+          responses: responseRef.current  // ✅ dùng ref thay vì state
         });
       } catch (err) {
         console.error("❌ Failed to save game results:", err);
       }
+
     });
 
     socket.on("gamePaused", () => setIsPaused(true));
@@ -120,15 +131,12 @@ export default function GameRoom() {
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setSelectedAnswerIndex(index);
     setAnswered(true);
-    setAllResponses((prev) => [
-      ...prev,
-      {
-        playerName: user?.username,
-        questionText: question,
-        answerIndex: index,
-        timeTaken
-      }
-    ]);
+    responseRef.current.push({
+      playerName: user?.username,
+      questionText: question,
+      answerIndex: index,
+      timeTaken
+    });
     socket.emit("submitAnswer", roomId, index, timeTaken);
   };
 
@@ -143,15 +151,14 @@ export default function GameRoom() {
     if (answered || selectedMultiAnswers.length === 0) return;
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setAnswered(true);
-    setAllResponses((prev) => [
-      ...prev,
-      {
-        playerName: user?.username,
-        questionText: question,
-        answerIndices: selectedMultiAnswers,
-        timeTaken
-      }
-    ]);
+    // Multiple Choice
+    responseRef.current.push({
+      playerName: user?.username,
+      questionText: question,
+      answerIndices: selectedMultiAnswers,
+      timeTaken
+    });
+
     socket.emit("submitMultipleAnswers", roomId, selectedMultiAnswers, timeTaken);
   };
 
@@ -159,15 +166,14 @@ export default function GameRoom() {
     if (answered || !shortAnswerText.trim()) return;
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setAnswered(true);
-    setAllResponses((prev) => [
-      ...prev,
-      {
-        playerName: user?.username,
-        questionText: question,
-        answerText: shortAnswerText.trim(),
-        timeTaken
-      }
-    ]);
+    // Short Answer
+    responseRef.current.push({
+      playerName: user?.username,
+      questionText: question,
+      answerText: shortAnswerText.trim(),
+      timeTaken
+    });
+
     socket.emit("submitShortAnswer", roomId, shortAnswerText.trim(), timeTaken);
   };
 
@@ -298,13 +304,6 @@ export default function GameRoom() {
           <p className="game-question-text">{question}</p>
         </div>
         {renderOptions()}
-        {/* <div className="game-scores">
-          {scores.map((player, idx) => (
-            <p key={idx}>
-              {player.name}: {player.score}
-            </p>
-          ))}
-        </div> */}
       </div>
     </div>
   );
