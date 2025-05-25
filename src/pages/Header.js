@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, MenuItem, IconButton } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
+import socket from "../socket";
 import "../assets/styles/Header.css";
+
 
 // Component cho phần Input PIN
 const PinInput = ({ pinValue, handlePinChange, handlePinSubmit }) => (
@@ -15,7 +17,7 @@ const PinInput = ({ pinValue, handlePinChange, handlePinSubmit }) => (
       onChange={handlePinChange}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          handlePinSubmit();
+          handlePinSubmit(); // Gửi PIN khi nhấn Enter
         }
       }}
       className="pin-input"
@@ -71,7 +73,7 @@ const SearchBar = ({ isSearchActive, toggleSearch }) => (
 
 function Header() {
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [pinValue, setPinValue] = useState("");
+  const [pinValue, setPinValue] = useState(""); // Lưu giá trị PIN
   const [user, setUser] = useState(null);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
   const navigate = useNavigate();
@@ -82,7 +84,7 @@ function Header() {
       const storedUser = localStorage.getItem("user");
       if (storedUser && storedUser !== "undefined") {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        setUser(parsedUser); // Cập nhật user state từ localStorage
       } else {
         setUser(null);
       }
@@ -94,7 +96,7 @@ function Header() {
   };
 
   useEffect(() => {
-    updateUserState();
+    updateUserState(); // Cập nhật trạng thái người dùng khi component mount
   }, []);
 
   useEffect(() => {
@@ -113,38 +115,72 @@ function Header() {
     };
   }, []);
 
+  // Lắng nghe sự kiện roomJoined từ server để điều hướng người dùng
+  useEffect(() => {
+    socket.on("roomJoined", (response) => {
+      if (response.success) {
+        // Sau khi tham gia thành công, chuyển đến phòng chờ
+        navigate(`/waiting-room/${pinValue}`); // Điều hướng đến trang phòng chờ
+      } else {
+        alert("Không thể tham gia phòng. Vui lòng thử lại!");
+      }
+    });
+
+    return () => {
+      socket.off("roomJoined");
+    };
+  }, [pinValue, navigate]); // Chỉ lắng nghe khi pinValue hoặc navigate thay đổi
+
+  // Toggle chức năng search
   const toggleSearch = () => {
     setIsSearchActive(!isSearchActive);
   };
 
+  // Hàm xử lý khi người dùng thay đổi PIN
   const handlePinChange = (e) => {
     setPinValue(e.target.value);
   };
 
+  // Hàm tham gia phòng khi nhấn "Enter"
   const handlePinSubmit = () => {
     if (pinValue.trim() !== "") {
-      navigate(`/game/${pinValue}`);
+      // Gửi yêu cầu tham gia phòng
+      socket.emit("joinRoom", pinValue, user?.username || "Guest");
     }
   };
 
+  // Mở menu cài đặt
   const handleSettingsClick = (event) => {
     setSettingsAnchorEl(event.currentTarget);
   };
 
+  // Đóng menu cài đặt
   const handleSettingsClose = () => {
     setSettingsAnchorEl(null);
   };
 
+  // Điều hướng đến dashboard
   const handleDashboardClick = () => {
     navigate("/dashboard");
     handleSettingsClose();
   };
 
+  // Điều hướng đến profile
   const handleProfileClick = () => {
     navigate("/profile");
     handleSettingsClose();
   };
+    const handleMyQuizzesClick = () => {
+    navigate("/my-quizz");
+    handleSettingsClose();
+  };
+  const handleHistoryClick = () => {
+    navigate("/history-quizzes");
+    handleSettingsClose();
+  }
+  
 
+  // Đăng xuất
   const handleLogout = () => {
     localStorage.clear();
     setUser(null);
@@ -155,8 +191,9 @@ function Header() {
   return (
     <header className="header">
       <div className="main-header">
-        <div className="logo">NQUIZ.com</div>
+        <div className="logo" onClick={() => navigate("/Home")} style={{ cursor: "pointer" }}>NQUIZ.com</div>
 
+        {/* Hiển thị Input PIN để tham gia phòng */}
         <PinInput
           pinValue={pinValue}
           handlePinChange={handlePinChange}
@@ -183,6 +220,8 @@ function Header() {
             onClose={handleSettingsClose}
           >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+            <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
+            <MenuItem onClick={handleHistoryClick}>History</MenuItem>
             {user?.role === "admin" && (
               <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
             )}

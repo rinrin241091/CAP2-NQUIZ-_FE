@@ -1,50 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Menu, MenuItem, IconButton } from "@mui/material";
+import { Menu, MenuItem, IconButton } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import "../../assets/styles/HeaderDashboard.css";
-
-// Component cho phần User Profile Menu
-const AvatarMenu = ({
-  user,
-  handleUserMenu,
-  anchorEl,
-  handleCloseMenu,
-  handleLogout,
-  handleProfile,
-}) => (
-  <>
-    <div className="user-profile" onClick={handleUserMenu}>
-      {user.avatar_url ? (
-        <Avatar
-          src={user.avatar_url}
-          alt={user.username}
-          className="user-avatar"
-        />
-      ) : (
-        <Avatar className="user-avatar">
-          {user.username?.charAt(0).toUpperCase()}
-        </Avatar>
-      )}
-      <span className="username">{user.username}</span>
-    </div>
-    <Menu
-      anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
-      onClose={handleCloseMenu}
-    >
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </Menu>
-  </>
-);
+import "../assets/styles/HeaderMyQuizz.css";
 
 function Header() {
   const [user, setUser] = useState(null);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
   const navigate = useNavigate();
 
-  // Function to update user state from localStorage
+  // Cập nhật user từ localStorage
   const updateUserState = () => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -61,17 +26,13 @@ function Header() {
     }
   };
 
-  // Initial user state setup
   useEffect(() => {
     updateUserState();
   }, []);
 
-  // Listen for login/logout events
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === "user") {
-        updateUserState();
-      }
+      if (e.key === "user") updateUserState();
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -91,10 +52,24 @@ function Header() {
     setSettingsAnchorEl(null);
   };
 
-  const handleHomepageClick = () => {
-    navigate("/Home");
+  const handleDashboardClick = () => {
+    navigate("/dashboard");
     handleSettingsClose();
   };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+    handleSettingsClose();
+  };
+
+  const handleMyQuizzesClick = () => {
+    navigate("/my-quizz");
+    handleSettingsClose();
+  };
+  const handleHistoryClick = () => {
+    navigate("/history-quizzes");
+    handleSettingsClose();
+  }
 
   const handleLogout = () => {
     localStorage.clear();
@@ -104,18 +79,15 @@ function Header() {
   };
 
   return (
-    <header className="header-dashboard">
-      <div className="main-header-dashboard">
-        <div
-          className="logo"
-          onClick={() => navigate("/Home")}
-          style={{ cursor: "pointer" }}
-        >
-          NQUIZ Dashboard
+    <header className="header-my-quizzes">
+      <div className="main-header">
+        <div className="logo" onClick={() => navigate("/Home")} style={{ cursor: "pointer" }}>
+          NQUIZ.com
         </div>
-        <div className="header-dashboard-buttons">
+
+        <div className="header-buttons">
           <IconButton
-            className="settings-btn-dashboard"
+            className="settings-btn"
             aria-label="Settings"
             onClick={handleSettingsClick}
           >
@@ -127,7 +99,12 @@ function Header() {
             open={Boolean(settingsAnchorEl)}
             onClose={handleSettingsClose}
           >
-            <MenuItem onClick={handleHomepageClick}>Home</MenuItem>
+            <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+            <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
+            <MenuItem onClick={handleHistoryClick}>History</MenuItem>
+            {user?.role === "admin" && (
+              <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
+            )}
           </Menu>
 
           {user ? (

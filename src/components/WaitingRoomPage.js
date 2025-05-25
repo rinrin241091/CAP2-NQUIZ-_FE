@@ -1,114 +1,159 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../assets/styles/WaitingRoomPage.css";
+import socket from "../socket";
+import { playQuiz } from "../services/api";
 
-export default function WaitingRoomPage() {
+export default function WaitingRoomPage(props) {
+  const [showRoomId, setShowRoomId] = useState(true);
+  const { roomId: urlRoomId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const roomId = props.roomId || urlRoomId;
+  const quizId = props.quizId || location.state?.quizId;
+  const isHost = props.isHost ?? location.state?.isHost;
+  const initialPlayers = props.players || location.state?.players || [];
+
+  const [players, setPlayers] = useState(initialPlayers);
+  const [maxWidth, setMaxWidth] = useState(0);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    socket.on("updatePlayers", (playersList) => {
+      setPlayers(playersList);
+    });
+
+    socket.on("gameStarted", () => {
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player) => ({ ...player, status: "playing" }))
+      );
+      navigate(`/game-room/${roomId}?isHost=${isHost}`, {
+        state: {
+          quizId, // 👈 truyền quizId sang GameRoom
+        },
+      });
+
+    });
+
+    socket.on("newQuestion", () => {
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player) => ({ ...player, status: "playing" }))
+      );
+      navigate(`/game-room/${roomId}?isHost=${isHost}`, {
+        state: {
+          quizId, // 👈 truyền quizId sang GameRoom
+        },
+      });
+
+    });
+
+    socket.on("currentQuestion", (questionData) => {
+      if (questionData) {
+        setPlayers((prevPlayers) =>
+          prevPlayers.map((player) => ({ ...player, status: "playing" }))
+        );
+        navigate(`/game-room/${roomId}?isHost=${isHost}`, { state: { question: questionData } });
+      }
+    });
+
+    if (roomId) {
+      socket.emit("getPlayers", roomId);
+    }
+
+    return () => {
+      socket.off("updatePlayers");
+      socket.off("gameStarted");
+      socket.off("newQuestion");
+      socket.off("currentQuestion");
+    };
+  }, [roomId, navigate, isHost]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const playerElements = containerRef.current.querySelectorAll(".player-name");
+    let max = 0;
+    playerElements.forEach((el) => {
+      const w = el.scrollWidth;
+      if (w > max) max = w;
+    });
+    setMaxWidth(max);
+  }, [players]);
+
+  const mid = Math.ceil(players.length / 2);
+  const leftColumn = players.slice(0, mid);
+  const rightColumn = players.slice(mid);
+  const isTwoColumns = players.length > 8;
+  const playerStyle = maxWidth ? { width: maxWidth + 20 } : {};
+
+  const handleStartGame = async () => {
+    try {
+      console.log("Việt gửi khi bấm start:",quizId );
+      await playQuiz(quizId);
+      socket.emit("startGame", roomId);
+    } catch (error) {
+      console.error("Failed to update play count:", error);
+      alert("Failed to start the game. Please try again.");
+    }
+  };
+
   return (
     <div className="waiting-wrapper">
-      {/* Left side - Join info */}
       <div className="left-panel">
-        <p className="join-text">Join at:</p>
-        <img
-          src="/quiz-logo-colored.png"
-          alt="Quiz.com"
-          className="quiz-com-logo"
-        />
-
         <p className="waiting-pin-label">PIN code:</p>
-        <p className="waiting-pin-number">646 945</p>
-
+        {showRoomId ? (
+          <p className="waiting-pin-number">{roomId}</p>  
+        ) : (
+          <p className="waiting-pin-number">••••••</p>
+        )}
+        <button className="waiting-start-btn" onClick={() => (window.location.href = "http://localhost:3001")}>HomePage</button>
         <div className="waiting-pin-actions">
-          <button className="waiting-link-btn">🔗 Copy</button>
-          <button className="waiting-link-btn">🙈 Hide</button>
+          <button  className="waiting-link-btn" onClick={() => navigator.clipboard.writeText(roomId)}> 🔗 Copy  </button>
+          <button className="waiting-link-btn" onClick={() => setShowRoomId(!showRoomId)}> {showRoomId ? "🙈 Hide" : "👁️ Show"} </button>
         </div>
-
-        <img src="/qr.png" alt="QR Code" className="qr-code" />
 
         <p className="waiting-text">Waiting for players</p>
-        <p className="waiting-join-device">👤 Join on this device</p>
 
-        <button className="waiting-start-btn">Start game</button>
-      </div>
-
-      {/* Right side - Quiz Info and Settings */}
-      <div className="waiting-right-panel">
-        <div className="waiting-quiz-card">
-          <div className="waiting-quiz-thumb">🖼️</div>
-          <div>
-            <p className="waiting-quiz-title">Football 2.0</p>
-            <p className="waiting-quiz-meta">2 slides • 🌍 Unknown</p>
-            <p className="waiting-preview-btn">👁️ Preview</p>
-          </div>
+        <div
+          className={`players-list ${isTwoColumns ? "two-columns" : ""}`}
+          ref={containerRef}
+        >
+          {players.length === 0 ? (
+            <p>No players have joined yet.</p>
+          ) : isTwoColumns ? (
+            <>
+              <div className="column">
+                {leftColumn.map((player, index) => (
+                  <p key={index} className="player-name" style={playerStyle}>
+                    {player.name}{" "}
+                    {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                  </p>
+                ))}
+              </div>
+              <div className="column">
+                {rightColumn.map((player, index) => (
+                  <p key={index} className="player-name" style={playerStyle}>
+                    {player.name}{" "}
+                    {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : (
+            players.map((player, index) => (
+              <p key={index} className="player-name" style={playerStyle}>
+                {player.name}{" "}
+                {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+              </p>
+            ))
+          )}
         </div>
 
-        <div className="waiting-scrollable-settings">
-          <div className="waiting-settings-block">
-            <h3>Sound</h3>
-            <div className="waiting-slider-row">
-              Music <input type="range" />
-            </div>
-            <div className="waiting-slider-row">
-              YouTube <input type="range" />
-            </div>
-            <div className="waiting-slider-row">
-              Voice <input type="range" />
-            </div>
-            <div className="waiting-slider-row">
-              Effects <input type="range" />
-            </div>
-          </div>
-
-          <div className="waiting-settings-block">
-            <h3>Gameplay</h3>
-            <div className="waiting-option">
-              <input type="checkbox" /> Team mode{" "}
-              <span className="tag-new">NEW!</span>
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" /> Hide leaderboard
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" /> Hide country flags
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" /> No YouTube media
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" /> Mute sound on players devices
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" /> Optimize performance
-            </div>
-          </div>
-
-          <div className="waiting-settings-block">
-            <h3>Safety</h3>
-            <div className="waiting-option">
-              <input type="checkbox" id="safe-names" />{" "}
-              <label htmlFor="safe-names">Only safe player names</label>
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" id="hide-type-answers" />{" "}
-              <label htmlFor="hide-type-answers">
-                Hide incorrect type-answers
-              </label>
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" id="dont-read-names" />{" "}
-              <label htmlFor="dont-read-names">
-                Don't read out player names
-              </label>
-            </div>
-            <div className="waiting-option">
-              <input type="checkbox" id="ban-kicked" />{" "}
-              <label htmlFor="ban-kicked">Ban kicked players</label>
-            </div>
-          </div>
-
-          <div className="waiting-custom-settings">
-            <h3>You got custom settings</h3>
-            <button className="waiting-reset-btn">Reset all settings</button>
-          </div>
-        </div>
+        {isHost && (
+          <button className="waiting-start-btn" onClick={handleStartGame}>
+            Start game
+          </button>
+        )}
       </div>
     </div>
   );

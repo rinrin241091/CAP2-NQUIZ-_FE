@@ -207,3 +207,50 @@
   cursor: pointer;
   font-size: 14px;
 }
+
+ 
+ .players-list {
+  max-width: 600px;
+  max-height: 100vh;
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.players-list.two-columns {
+  flex-direction: row;
+  gap: 20px;
+  justify-content: center;
+}
+
+.players-list.two-columns > .column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  align-items: flex-start;
+}
+
+.player-name {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #000;
+  box-sizing: border-box;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+

@@ -84,8 +84,10 @@ export default function QuizEditorPage() {
   useEffect(() => {
     const fetchQuestionTypes = async () => {
       try {
-        const res = await axiosInstance.get("/api/question-types");
-        setQuestionTypes(Array.isArray(res.data) ? res.data : res.data?.data || []);
+        const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+        const res = await fetch(`${apiUrl}/api/question-types`);
+        const data = await res.json();
+        setQuestionTypes(Array.isArray(data) ? data : data.data || []);
       } catch (err) {
         setQuestionTypes([]);
       }

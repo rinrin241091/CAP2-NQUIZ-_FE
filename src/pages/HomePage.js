@@ -1,11 +1,55 @@
-// src/pages/HomePage.js
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "../components/Footer";
 import "../styles/homepage.css";
+import socket from "../socket";
+import {
+  getHomePageQuizzesRadom,
+  getRecentlyPlayedQuizzes,
+  getHomePagePopularQuizzes,
+  getQuizzesSocket,
+} from "../services/api";
 
 function HomePage() {
+  const [randomSelectionQuizzes, setRandomSelectionQuizzes] = useState([]);
+  const [popularAmongPeopleQuizzes, setPopularAmongPeopleQuizzes] = useState(
+    []
+  );
+  const [recentlyPlayedQuizzes, setRecentlyPlayedQuizzes] = useState([]);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchAllQuizzes = async () => {
+      try {
+        const [randomRes, popularRes, recentRes] = await Promise.all([
+          getHomePageQuizzesRadom(),
+          getHomePagePopularQuizzes(),
+          getRecentlyPlayedQuizzes(),
+        ]);
+
+        const format = (quiz, defaultImg = "/default.jpg") => ({
+          id: quiz.quiz_id,
+          title: quiz.title,
+          author: quiz.users || "Unknown",
+          image: quiz.image || defaultImg,
+          plays: quiz.play_count || "0",
+        });
+
+        setRandomSelectionQuizzes(randomRes.data.map((q) => format(q)));
+        setPopularAmongPeopleQuizzes(popularRes.data.map((q) => format(q)));
+        setRecentlyPlayedQuizzes(recentRes.data.map((q) => format(q)));
+      } catch (error) {
+        console.error("Failed to fetch quizzes:", error);
+      }
+    };
+
+    if (location.pathname === "/" || location.pathname === "/Home") {
+      fetchAllQuizzes();
+    }
+  }, [location.pathname]);
+
   return (
     <>
       <Header />
@@ -15,7 +59,7 @@ function HomePage() {
         <QuizSection
           title="Recently published"
           buttonText="Play Now"
-          quizzes={recentlyPublishedQuizzes}
+          quizzes={recentlyPlayedQuizzes}
         />
         <QuizSection
           title="Popular among people for all"
@@ -23,11 +67,6 @@ function HomePage() {
           quizzes={popularAmongPeopleQuizzes}
         />
         <VoteSection />
-        <QuizSection
-          title="Best voting right now"
-          buttonText="Play Now"
-          quizzes={bestVotingQuizzes}
-        />
         <QuizSection
           title="Random selection"
           buttonText="Play Now"
@@ -43,12 +82,12 @@ function Navigation() {
   const navigate = useNavigate();
   const navItems = [
     { icon: "🏠", label: "Home", path: "/Home" },
-    { icon: "🏆", label: "Leaderboard", path: "/leaderboard" },
-    { icon: "⭐", label: "Entertainment", path: "/entertainment" },
-    { icon: "🏠", label: "History", path: "/history" },
-    { icon: "🔍", label: "Languages", path: "/languages" },
-    { icon: "💰", label: "Science & Nature", path: "/sciencenature" },
-    { icon: "🎮", label: "Sports", path: "/sports" },
+    { icon: "➗", label: "Math", path: "/math" },
+    { icon: "🧲", label: "Physics", path: "/physical" },
+    { icon: "⚗️", label: "Chemistry", path: "/chemistry" },
+    { icon: "📚", label: "Literature", path: "/literature" },
+    { icon: "🏛️", label: "History", path: "/history" },
+    { icon: "🗺️", label: "Geography", path: "/geography" },
   ];
 
   return (
@@ -72,42 +111,21 @@ function Navigation() {
 function HeroSection() {
   const navigate = useNavigate();
   return (
-    <section className="hero-section">
-      <div className="hero-card create-quiz">
-        <div className="hero-content">
-          <img
-            src="/create-quiz-character.png"
-            alt="Character"
-            className="hero-image"
-          />
-          <div className="hero-text">
-            <h2>Create a quiz</h2>
-            <p>Play for free with 500 participants</p>
-
-            <button
-              className="hero-btn"
-              onClick={() => navigate("/create-quiz")}
-            >
-              Quiz editor
-            </button>
-          </div>
+    <div className="hero-card create-quiz">
+      <div className="hero-content">
+        <img
+          src="https://s3.ap-southeast-2.amazonaws.com/relux.cloude.com/chibi_student_canvas_430x300_hex_fee9c3.png"
+          alt="Character"
+          className="hero-image"
+        />
+        <div className="hero-text">
+          <h2>Create a quiz</h2>
+          <button className="hero-btn" onClick={() => navigate("/create-quiz")}>
+            Quiz editor
+          </button>
         </div>
       </div>
-      <div className="hero-card ai-quiz">
-        <div className="hero-content">
-          <img
-            src="/ai-quiz-character.png"
-            alt="AI Character"
-            className="hero-image"
-          />
-          <div className="hero-text">
-            <h2>A.I.</h2>
-            <p>Generate a quiz from any subject or pdf</p>
-            <button className="hero-btn">Quiz generator</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }
 
@@ -127,17 +145,53 @@ function QuizSection({ title, buttonText, quizzes }) {
 }
 
 function QuizCard({ quiz, buttonText }) {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const name = user?.username || "Người chơi";
+
+  const handlePlayNow = async () => {
+  const quizId = quiz.id;
+
+  try {
+    const res = await getQuizzesSocket(quizId);
+    if (res.data.success && res.data.data.length > 0) {
+      const questions = res.data.data;
+      console.log("🧪 FE gửi questions vào socket:", questions);
+
+      // Gửi quizId + questions vào socket để tạo room
+      socket.emit("createRoom", name, quizId, questions);
+
+      socket.once("roomCreated", (roomId) => {
+        navigate(`/waiting-room/${roomId}`, {
+          state: {
+            quizId,
+            isHost: true,
+            playerName: name,
+          },
+        });
+      });
+    } else {
+      alert("❌ Quiz này chưa có câu hỏi nào!");
+    }
+  } catch (err) {
+    console.error("Lỗi khi lấy câu hỏi:", err);
+    alert("❌ Lỗi khi tạo phòng chơi!");
+  }
+};
+
   return (
     <div className="quiz-card">
       <div className="quiz-image-container">
         <img src={quiz.image} alt={quiz.title} className="quiz-image" />
       </div>
       <div className="quiz-details">
-        <button className="play-btn">{buttonText}</button>
+        <button className="play-btn" onClick={handlePlayNow}>
+          {buttonText}
+        </button>
         <h3 className="quiz-title">{quiz.title}</h3>
         <div className="quiz-meta">
           <span className="by-author">By {quiz.author}</span>
-          <span className="participants">{quiz.participants} participants</span>
+          <span className="participants">{quiz.plays} Plays</span>
         </div>
       </div>
     </div>
@@ -154,138 +208,5 @@ function VoteSection() {
     </section>
   );
 }
-
-// Mock data for quizzes
-const recentlyPublishedQuizzes = [
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-1.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-2.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-3.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-4.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-5.jpg",
-  },
-];
-
-const popularAmongPeopleQuizzes = [
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-6.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-7.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-8.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-9.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-10.jpg",
-  },
-];
-
-const bestVotingQuizzes = [
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-11.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-12.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-13.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-14.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-15.jpg",
-  },
-];
-
-const randomSelectionQuizzes = [
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-16.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-17.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-18.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-19.jpg",
-  },
-  {
-    title: "Sample Quiz Title",
-    author: "Username",
-    participants: "5K",
-    image: "/quiz-image-20.jpg",
-  },
-];
 
 export default HomePage;

@@ -79,6 +79,42 @@ export const getQuizzes = (params) => api.get("/quizzes", { params });
 export const getQuiz = (id) => api.get(`/quizzes/${id}`);
 export const createQuiz = (quizData) => api.post("/quizzes", quizData);
 export const updateQuiz = (id, quizData) => api.put(`/quizzes/${id}`, quizData);
-export const deleteQuiz = (id) => api.delete(`/quizzes/${id}`);
+export const deleteQuiz = (id) => api.delete(`api/quizzes/delete/${id}`);
+
+//home page
+export const getHomePageQuizzes = () => api.get("/home-page/all");
+export const getHomePageQuizzesRadom = () => api.get("/home-page/random");
+export const getHomePagePopularQuizzes = () => api.get("/home-page/popular");
+export const getRecentlyPlayedQuizzes = () => api.get("/home-page/recently-played");
+
+
+export const playQuiz = (quizId) => api.post(`/question/${quizId}/play`);
+
+export const getQuizzesByUser = (userId) => api.get(`/home-page/user/${userId}`);
+
+export const getQuizzesHistory = (userId) => api.get(`/history/creator/${userId}`);
+
+export const getTotalUsers = () => api.get('/api/dashboard/total-users');
+export const getTotalQuizzes = () => api.get('/api/dashboard/total-quizzes');
+export const getTotalPlays = () => api.get('/api/dashboard/total-plays');
+export const getChartData = (range) => api.get(`/api/dashboard/chart-data?range=${range}`);
+
+//lấy câu hỏi
+export const getQuizzesSocket = (quizId) => api.get(`/question/quiz/${quizId}`);
+export const saveGameResults = (payload) => api.post(`/game/save-results`, payload);
+
+export const getMath = () => api.get('/navigate/math');
+export const getLiterature = () => api.get('/navigate/literature');
+export const getHistory = () => api.get('/navigate/history');
+export const getGeography = () => api.get('/navigate/geography');
+export const getPhysics = () => api.get('/navigate/physics');
+export const getChemistry = () => api.get('/navigate/chemistry');
+
+export const getQuizReview = (userId, quizId) => api.get(`/history/review/${userId}/${quizId}`);
+export const getQuizAttemptsByUserAndQuiz = (userId, quizId) =>api.get(`/history/attempts/${userId}/${quizId}`);
+export const getQuizReviewBySession = (sessionId, userId) =>api.get(`/history/review/by-session/${sessionId}/${userId}`);
+
+
+
 
 export default api;
