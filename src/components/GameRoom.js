@@ -31,9 +31,12 @@ export default function GameRoom() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const quizId = state?.quizId || null;
+  const receivedQuestionRef = useRef(null);
 
   useEffect(() => {
     socket.on("newQuestion", (data) => {
+      if (receivedQuestionRef.current === data.question) return;
+      receivedQuestionRef.current = data.question;
       setQuestion(data.question);
       setOptions(data.answers);
       setQuestionType(data.question_type);
@@ -94,6 +97,7 @@ export default function GameRoom() {
 
     if (roomId) {
       socket.emit("getPlayers", roomId);
+      socket.emit("requestCurrentQuestion", roomId);
     }
 
     return () => {
@@ -103,7 +107,7 @@ export default function GameRoom() {
       socket.off("gamePaused");
       socket.off("gameResumed");
     };
-  }, [roomId, finalScores, allResponses]);
+  }, []);
 
   useEffect(() => {
     if (seconds === 0 || isPaused) return;
