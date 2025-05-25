@@ -17,6 +17,8 @@ export default function OneCorrectAnswer() {
   const [answers, setAnswers] = React.useState([
     { answer_text: "", is_correct: true },
     { answer_text: "", is_correct: false },
+    { answer_text: "", is_correct: false },
+    { answer_text: "", is_correct: false },
   ]);
   const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const [errorSubmit, setErrorSubmit] = React.useState('');

@@ -74,7 +74,7 @@
         if (role === "admin") {
           navigate("/dashboard");
         } else {
-          navigate("/home");
+          navigate("/");
         }
       } catch (err) {
         setError(err.response?.data?.message || "An error occurred during login");

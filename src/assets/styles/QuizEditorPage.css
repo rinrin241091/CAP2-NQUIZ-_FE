@@ -184,3 +184,66 @@
   padding: 0 24px;
   z-index: 1000;
 }
+
+.existing-questions-section {
+  padding: 20px;
+  border-radius: 8px; /* Bo góc cho phần danh sách */
+}
+
+.question-item {
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between; /* Căn chỉnh nội dung */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  border-radius: 8px; /* Bo góc */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+.question-item:hover {
+  /* Bỏ màu nền khi hover */
+}
+
+.question-actions {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các icon */
+}
+
+.icon {
+  cursor: pointer; /* Con trỏ khi hover */
+  color: #00c2cb; /* Màu cho icon */
+  transition: color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+.icon:hover {
+  color: #01a4ab; /* Màu khi hover */
+}
+
+.pagination {
+  display: flex;
+  justify-content: center; /* Căn giữa phần phân trang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  margin: 20px 0; /* Khoảng cách trên và dưới */
+}
+
+.pagination button {
+  background-color: #00c2cb; /* Màu nền cho nút */
+  color: white; /* Màu chữ */
+  border: none; /* Bỏ viền */
+  padding: 10px 15px; /* Khoảng cách bên trong */
+  border-radius: 5px; /* Bo góc */
+  cursor: pointer; /* Con trỏ khi hover */
+  margin: 0 5px; /* Khoảng cách giữa các nút */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+.pagination button:hover {
+  background-color: #01a4ab; /* Màu khi hover */
+}
+
+.pagination span {
+  margin: 0 10px; /* Khoảng cách giữa nút và số trang */
+  font-weight: bold; /* Đậm chữ */
+  color: white; /* Màu chữ */
+}
