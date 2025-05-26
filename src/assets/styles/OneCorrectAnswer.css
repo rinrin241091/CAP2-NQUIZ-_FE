@@ -159,6 +159,7 @@
   border: none;
   background-color: #e5e5e5;
   color: #000;
+  margin: 5px;
 }
 
 textarea.input {

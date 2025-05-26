@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./HeaderMyquizz";
 import Footer from "../components/Footer";
+import CreateQuiz from "./CreateQuiz";
 import "../styles/myquizz.css";
 import socket from "../socket";
 import {
@@ -12,8 +13,7 @@ import {
 
 function MyQuizz() {
   const [quizzes, setQuizzes] = useState([]);
-  const [editingId, setEditingId] = useState(null);
-  const [editedTitle, setEditedTitle] = useState("");
+  const [openCreate, setOpenCreate] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState(null);
 
@@ -64,6 +64,12 @@ const handlePlayNow = async (quizId) => {
   }
 };
 
+  const handleCreateClose = (quizId) => {
+    setOpenCreate(false);
+    if (quizId) {
+      // redirect nếu cần
+    }
+  };
 
   const handleDelete = async (quizId) => {
     try {
@@ -73,20 +79,6 @@ const handlePlayNow = async (quizId) => {
       console.error("Lỗi khi xóa quiz:", error);
     }
   };
-
-  // const handleUpdate = async (quizId) => {
-  //   try {
-  //     await updateQuizTitleById(quizId, editedTitle);
-  //     setQuizzes((prev) =>
-  //       prev.map((quiz) =>
-  //         quiz.quiz_id === quizId ? { ...quiz, title: editedTitle } : quiz
-  //       )
-  //     );
-  //     setEditingId(null);
-  //   } catch (error) {
-  //     console.error("Lỗi khi cập nhật quiz:", error);
-  //   }
-  // };
 
   return (
     <div className="page-container">
@@ -103,11 +95,12 @@ const handlePlayNow = async (quizId) => {
               <option>Oldest first</option>
             </select>
           </div>
-          <button class="add-quiz-btn">
+          <button class="add-quiz-btn" onClick={() => setOpenCreate(true)}>
             Add Quiz
           </button>
 
         </div>
+        <CreateQuiz open={openCreate} onClose={handleCreateClose} />
 
         <div className="quiz-list">
           {quizzes.map((quiz) => (
@@ -118,20 +111,6 @@ const handlePlayNow = async (quizId) => {
                 className="quiz-thumbnail"
               />
               <div className="quiz-details">
-                {editingId === quiz.quiz_id ? (
-                  <>
-                    <input
-                      value={editedTitle}
-                      onChange={(e) => setEditedTitle(e.target.value)}
-                    />
-                    {/* <button onClick={() => handleUpdate(quiz.quiz_id)}> */}
-                      <button>
-                      Save
-                    </button>
-                    <button onClick={() => setEditingId(null)}>Cancel</button>
-                  </>
-                ) : (
-                  <>
                     <h3>{quiz.title}</h3>
                     <p>
                       <span>Plays: {quiz.play_count}</span> |{" "}
@@ -146,10 +125,7 @@ const handlePlayNow = async (quizId) => {
                       </button>
                       <button
                         className="update-btn"
-                        onClick={() => {
-                          setEditingId(quiz.quiz_id);
-                          setEditedTitle(quiz.title);
-                        }}
+                         onClick={() => navigate(`/quiz-editor/${quiz.quiz_id}`)}
                       >
                         Edit
                       </button>
@@ -163,8 +139,6 @@ const handlePlayNow = async (quizId) => {
                         Delete
                       </button>
                     </div>
-                  </>
-                )}
               </div>
             </div>
           ))}

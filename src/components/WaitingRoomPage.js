@@ -21,18 +21,24 @@ export default function WaitingRoomPage(props) {
 
   const [playerName, setPlayerName] = useState("");
   const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser || storedUser === "undefined") {
-      setShowNamePrompt(true);
-    } else {
-      const username = JSON.parse(storedUser)?.username;
-      if (username) {
-        socket.emit("joinRoom", roomId, username);
+    // Gửi joinRoom nếu chưa join và không phải host
+    if (!hasJoined && !isHost && roomId) {
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser || storedUser === "undefined") {
+        setShowNamePrompt(true); // Hiện form nhập tên
+      } else {
+        const username = JSON.parse(storedUser)?.username;
+        if (username) {
+          socket.emit("joinRoom", roomId, username);
+          setHasJoined(true);
+        }
       }
     }
 
+    // Lắng nghe danh sách người chơi cập nhật
     socket.on("updatePlayers", (playersList) => {
       setPlayers(playersList);
     });
@@ -76,7 +82,7 @@ export default function WaitingRoomPage(props) {
       socket.off("newQuestion");
       socket.off("currentQuestion");
     };
-  }, [roomId, navigate, isHost]);
+  }, [roomId, navigate, isHost, hasJoined]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -110,6 +116,7 @@ export default function WaitingRoomPage(props) {
     if (playerName.trim()) {
       socket.emit("joinRoom", roomId, playerName.trim());
       setShowNamePrompt(false);
+      setHasJoined(true);
     } else {
       alert("Please enter your name");
     }

@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  MenuItem,
+  Typography,
+  CircularProgress,
+  IconButton
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close'; // ✅ Mũi tên X
 import axiosInstance from '../services/axiosConfig';
 import '../styles/CreateQuiz.css';
 
-const CreateQuiz = () => {
-  const navigate = useNavigate();
+const CreateQuiz = ({ open, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -12,11 +23,10 @@ const CreateQuiz = () => {
     is_public: 1,
     category_id: ''
   });
-  const [imageFile, setImageFile] = useState(null); // ✅ ảnh
+  const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ✅ Gán giá trị input vào state
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -29,36 +39,44 @@ const CreateQuiz = () => {
     setImageFile(e.target.files[0]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      // ✅ Tạo formData để gửi dạng multipart/form-data
-      const data = new FormData();
-      data.append('title', formData.title);
-      data.append('description', formData.description);
-      data.append('is_public', formData.is_public);
-      data.append('category_id', formData.category_id);
-      if (imageFile) {
-        data.append('image', imageFile); // ✅ ảnh gửi lên backend
-      }
+  try {
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('description', formData.description);
+    data.append('is_public', formData.is_public);
+    data.append('category_id', formData.category_id);
 
-      const response = await axiosInstance.post('/api/quizzes', data);
-      console.log('CreateQuiz - API response:', response.data);
-      if (response.data && response.data.data && response.data.data.id) {
-        const quizId = response.data.data.id;
-        navigate(`/quiz-editor/${quizId}`);
-      } else {
-        setError('Quiz created but no ID returned, or backend error.');
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo quiz');
-    } finally {
-      setLoading(false);
+    if (imageFile) {
+      data.append('image', imageFile);
+    } else {
+      // 👇 Fetch ảnh mặc định từ URL bên ngoài
+      const defaultImageUrl = 'https://media.istockphoto.com/id/464516754/vi/vec-to/qu%E1%BB%91c-k%E1%BB%B3-vi%E1%BB%87t-nam.jpg?s=612x612&w=0&k=20&c=20_fpqn2SzR-BYCcTgc77EuiudsNnh1c0mVXVJzSNbk=';
+      const response = await fetch(defaultImageUrl);
+      const blob = await response.blob();
+      const defaultFile = new File([blob], 'default.jpg', { type: blob.type });
+      data.append('image', defaultFile);
     }
-  };
+
+    const response = await axiosInstance.post('/api/quizzes', data);
+    const quizId = response.data?.data?.id;
+
+    if (quizId) {
+      onClose(quizId);
+    } else {
+      setError('Tạo quiz thành công nhưng không nhận được ID');
+    }
+  } catch (err) {
+    setError(err.response?.data?.message || 'Có lỗi xảy ra khi tạo quiz');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -69,7 +87,7 @@ const CreateQuiz = () => {
         const res = await axiosInstance.get('/categories', {
           params: { user_id }
         });
-        setCategories((res.data && Array.isArray(res.data.data)) ? res.data.data : []);
+        setCategories((res.data?.data && Array.isArray(res.data.data)) ? res.data.data : []);
       } catch (err) {
         console.error('Lỗi khi lấy danh mục:', err);
       }
@@ -87,75 +105,86 @@ const CreateQuiz = () => {
   }, [categories]);
 
   return (
-    <div className="create-quiz-container">
-      <h1>Tạo Quiz Mới</h1>
-      <button
-        style={{ marginBottom: '16px' }}
-        onClick={() => navigate('/my-quizzes')}
-        type="button"
-      >
-        Danh sách quiz
-      </button>
-      {error && <div className="error-message">{error}</div>}
+    <Dialog open={open} onClose={() => onClose(null)} maxWidth="sm" fullWidth>
+      <DialogTitle>
+        <span>Tạo Quiz Mới</span>
+        <IconButton
+          aria-label="close"
+          onClick={() => onClose(null)}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: '#555',
+            '&:hover': {
+              color: '#d32f2f'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <DialogContent dividers>
+          {error && <Typography color="error">{error}</Typography>}
 
-      <form onSubmit={handleSubmit} className="quiz-form" encType="multipart/form-data">
-        <div className="form-group">
-          <label htmlFor="title">Tiêu đề:</label>
-          <input
-            type="text"
-            id="title"
+          <TextField
+            label="Tiêu đề"
             name="title"
+            fullWidth
             value={formData.title}
             onChange={handleChange}
+            margin="normal"
             required
-            placeholder="Nhập tiêu đề quiz"
           />
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="description">Mô tả:</label>
-          <textarea
-            id="description"
+          <TextField
+            label="Mô tả"
             name="description"
+            fullWidth
             value={formData.description}
             onChange={handleChange}
+            margin="normal"
             required
-            placeholder="Nhập mô tả quiz"
+            multiline
+            rows={3}
           />
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="category_id">Danh mục:</label>
-          <select
-            id="category_id"
+          <TextField
+            select
+            label="Danh mục"
             name="category_id"
-            value={formData.category_id || ''}
+            fullWidth
+            value={formData.category_id}
             onChange={handleChange}
+            margin="normal"
             required
           >
-            <option value="" disabled>Chọn danh mục</option>
             {categories.map(cat => (
-              <option key={cat.category_id} value={cat.category_id}>{cat.category_name}</option>
+              <MenuItem key={cat.category_id} value={cat.category_id}>
+                {cat.category_name}
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
 
-        <div className="form-group">
-          <label htmlFor="image">Ảnh Quiz:</label>
           <input
             type="file"
-            id="image"
-            name="image"
             accept="image/*"
             onChange={handleFileChange}
+            style={{ marginTop: '16px' }}
           />
-        </div>
+        </DialogContent>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Đang tạo...' : 'Tạo Quiz'}
-        </button>
+        <DialogActions>
+          <Button onClick={() => onClose(null)} disabled={loading}>
+            Hủy
+          </Button>
+          <Button type="submit" variant="contained" disabled={loading}>
+            {loading ? <CircularProgress size={20} /> : 'Tạo Quiz'}
+          </Button>
+        </DialogActions>
       </form>
-    </div>
+    </Dialog>
   );
 };
 

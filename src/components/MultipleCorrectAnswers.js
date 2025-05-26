@@ -27,7 +27,7 @@ export default function MultipleCorrectAnswers() {
       {/* Header */}
       <div className="multiple-header">
         <div className="multiple-header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
+          <h1>NQUIZ</h1>
           <button className="btn-back-multiple" onClick={() => navigate(`/quiz-editor/${quizId}`)}>
             ← Back to Quiz
           </button>
@@ -95,48 +95,12 @@ export default function MultipleCorrectAnswers() {
               value={funFact}
               onChange={(e) => setFunFact(e.target.value)}
             />
-            <div className="multiple-add-media">Add media to fun fact</div>
-          </div>
-
-          {/* Autocomplete */}
-          <button className="multiple-autocomplete-ai">
-            ⚡ Autocomplete with AI
-          </button>
-
-          {/* Options */}
-          <div className="multiple-options-section">
-            <select className="select">
-              <option>Question voice: English (Charles)</option>
-            </select>
-            <select className="select">
-              <option>Answer voice: English (Charles)</option>
-            </select>
-            <select className="select">
-              <option>Question type: Checkboxes</option>
-            </select>
-            <select className="select">
-              <option>Time: Normal time (20s)</option>
-            </select>
-          </div>
-
-          {/* Actions */}
-          <div className="multiple-actions">
-            <button className="btn-duplicate-multiple">Duplicate Slide</button>
-            <button className="btn-delete-multiple">Delete Slide</button>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="multiple-footer">        
-        <button
-          className="btn-settings-multiple"
-          type="button"
-          onClick={() => navigate("/quiz-settings")}
-        >
-          Settings
-        </button>
-        <button className="btn-add-slide-multiple">+</button>
+      <div className="multiple-footer">     
       </div>
     </div>
   );

@@ -18,50 +18,6 @@ import {
   Trash,
 } from "lucide-react";
 
-const slideTypes = [
-  { icon: <Square size={32} />, title: "Buttons", desc: "One correct answer" },
-  {
-    icon: <CheckSquare size={32} />,
-    title: "Checkboxes",
-    desc: "Multiple correct answers",
-  },
-  {
-    icon: <ListOrdered size={32} />,
-    title: "Reorder",
-    desc: "Place answers in the correct order",
-  },
-  {
-    icon: <Sliders size={32} />,
-    title: "Range",
-    desc: "Guess the answer on a scale",
-  },
-  {
-    icon: <MapPin size={32} />,
-    title: "Location",
-    desc: "Pin the answer on a map",
-  },
-  {
-    icon: <ImageIcon size={32} />,
-    title: "Pinpoint",
-    desc: "Pin the answer on an image",
-  },
-  {
-    icon: <FileText size={32} />,
-    title: "Type answer",
-    desc: "Type the correct answer",
-  },
-  {
-    icon: <Bot size={32} />,
-    title: "AI assisted",
-    desc: "Generate from a PDF",
-  },
-  {
-    icon: <Info size={32} />,
-    title: "Info slide",
-    desc: "Provide more context",
-  },
-];
-
 export default function QuizEditorPage() {
   const navigate = useNavigate();
   const { quizId } = useParams();
@@ -157,16 +113,16 @@ export default function QuizEditorPage() {
     <div className="quiz-editor-container">
       <div className="quiz-editor-header">
         <div className="quiz-editor-header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
+          <h1 className="logo" onClick={() => navigate("/")} >NQUIZ</h1>
           <button
             className="btn-back-editor"
-            onClick={() => navigate("/create-quiz")}
+            onClick={() => navigate("/")}
           >
-            ← Back to Create Quiz
+            ← Back to Home
           </button>
         </div>
         <div className="quiz-editor-header-right">
-          <button className="btn-preview-editor">Preview</button>
+          {/* <button className="btn-preview-editor">Preview</button> */}
           <button className="btn-done-editor">Done</button>
         </div>
       </div>

@@ -12,7 +12,7 @@ export default function OneCorrectAnswer() {
   const questionTypeId = state?.questionTypeId;
 
   const [questionText, setQuestionText] = React.useState("");
-  const [timeLimit, setTimeLimit] = React.useState(30);
+  const [timeLimit, setTimeLimit] = React.useState(10);
   const [points, setPoints] = React.useState(1);
   const [answers, setAnswers] = React.useState([
     { answer_text: "", is_correct: true },
@@ -58,19 +58,19 @@ export default function OneCorrectAnswer() {
       {/* Header */}
       <div className="one-header">
         <div className="one-header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
+          <h1>NQUIZ</h1>
           <button className="btn-back-one" onClick={() => navigate(`/quiz-editor/${quizId}`)}>
             ← Back to Quiz
           </button>
         </div>
         <div className="one-header-right">
-          <button className="btn-preview-one">Xem trước</button>
+          {/* <button className="btn-preview-one">Xem trước</button> */}
           <button
             className="btn-done-one"
             onClick={handleSubmitQuestion}
             disabled={loadingSubmit}
           >
-            {loadingSubmit ? 'Đang lưu...' : 'Hoàn thành'}
+            {loadingSubmit ? 'Đang lưu...' : 'Done'}
           </button>
         </div>
       </div>
@@ -156,14 +156,6 @@ export default function OneCorrectAnswer() {
 
       {/* Footer */}
       <div className="one-footer">
-        <button
-          className="btn-settings-one"
-          type="button"
-          onClick={() => navigate("/quiz-settings")}
-        >
-          Cài đặt
-        </button>
-        <button className="btn-add-slide-one">+</button>
       </div>
     </div>
   );

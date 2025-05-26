@@ -143,11 +143,11 @@ function Header() {
 
   // Hàm tham gia phòng khi nhấn "Enter"
   const handlePinSubmit = () => {
-    if (pinValue.trim() !== "") {
-      // Gửi yêu cầu tham gia phòng
-      socket.emit("joinRoom", pinValue, user?.username || "Guest");
-    }
-  };
+  if (pinValue.trim() !== "") {
+    navigate(`/waiting-room/${pinValue}`);
+  }
+};
+
 
   // Mở menu cài đặt
   const handleSettingsClick = (event) => {

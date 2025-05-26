@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "../components/Footer";
+import CreateQuiz from "./CreateQuiz";
 import "../styles/homepage.css";
 import socket from "../socket";
 import {
@@ -109,7 +110,15 @@ function Navigation() {
 }
 
 function HeroSection() {
-  const navigate = useNavigate();
+  const [openCreate, setOpenCreate] = useState(false);
+
+  const handleCreateClose = (quizId) => {
+    setOpenCreate(false);
+    if (quizId) {
+      // redirect nếu cần
+    }
+  };
+
   return (
     <div className="hero-card create-quiz">
       <div className="hero-content">
@@ -120,14 +129,18 @@ function HeroSection() {
         />
         <div className="hero-text">
           <h2>Create a quiz</h2>
-          <button className="hero-btn" onClick={() => navigate("/create-quiz")}>
+          <button className="hero-btn" onClick={() => setOpenCreate(true)}>
             Quiz editor
           </button>
         </div>
       </div>
+
+      {/* Popup Tạo quiz */}
+      <CreateQuiz open={openCreate} onClose={handleCreateClose} />
     </div>
   );
 }
+
 
 function QuizSection({ title, buttonText, quizzes }) {
   return (
