@@ -19,7 +19,20 @@ export default function WaitingRoomPage(props) {
   const [maxWidth, setMaxWidth] = useState(0);
   const containerRef = useRef(null);
 
+  const [playerName, setPlayerName] = useState("");
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser || storedUser === "undefined") {
+      setShowNamePrompt(true);
+    } else {
+      const username = JSON.parse(storedUser)?.username;
+      if (username) {
+        socket.emit("joinRoom", roomId, username);
+      }
+    }
+
     socket.on("updatePlayers", (playersList) => {
       setPlayers(playersList);
     });
@@ -29,11 +42,8 @@ export default function WaitingRoomPage(props) {
         prevPlayers.map((player) => ({ ...player, status: "playing" }))
       );
       navigate(`/game-room/${roomId}?isHost=${isHost}`, {
-        state: {
-          quizId, // 👈 truyền quizId sang GameRoom
-        },
+        state: { quizId },
       });
-
     });
 
     socket.on("newQuestion", () => {
@@ -41,11 +51,8 @@ export default function WaitingRoomPage(props) {
         prevPlayers.map((player) => ({ ...player, status: "playing" }))
       );
       navigate(`/game-room/${roomId}?isHost=${isHost}`, {
-        state: {
-          quizId, // 👈 truyền quizId sang GameRoom
-        },
+        state: { quizId },
       });
-
     });
 
     socket.on("currentQuestion", (questionData) => {
@@ -53,7 +60,9 @@ export default function WaitingRoomPage(props) {
         setPlayers((prevPlayers) =>
           prevPlayers.map((player) => ({ ...player, status: "playing" }))
         );
-        navigate(`/game-room/${roomId}?isHost=${isHost}`, { state: { question: questionData } });
+        navigate(`/game-room/${roomId}?isHost=${isHost}`, {
+          state: { question: questionData },
+        });
       }
     });
 
@@ -88,7 +97,7 @@ export default function WaitingRoomPage(props) {
 
   const handleStartGame = async () => {
     try {
-      console.log("Việt gửi khi bấm start:",quizId );
+      console.log("Việt gửi khi bấm start:", quizId);
       await playQuiz(quizId);
       socket.emit("startGame", roomId);
     } catch (error) {
@@ -97,19 +106,43 @@ export default function WaitingRoomPage(props) {
     }
   };
 
+  const handleJoinAsGuest = () => {
+    if (playerName.trim()) {
+      socket.emit("joinRoom", roomId, playerName.trim());
+      setShowNamePrompt(false);
+    } else {
+      alert("Please enter your name");
+    }
+  };
+
   return (
     <div className="waiting-wrapper">
       <div className="left-panel">
         <p className="waiting-pin-label">PIN code:</p>
         {showRoomId ? (
-          <p className="waiting-pin-number">{roomId}</p>  
+          <p className="waiting-pin-number">{roomId}</p>
         ) : (
           <p className="waiting-pin-number">••••••</p>
         )}
-        <button className="waiting-start-btn" onClick={() => (window.location.href = "http://localhost:3001")}>HomePage</button>
+        <button
+          className="waiting-start-btn"
+          onClick={() => (window.location.href = "http://localhost:3001")}
+        >
+          HomePage
+        </button>
         <div className="waiting-pin-actions">
-          <button  className="waiting-link-btn" onClick={() => navigator.clipboard.writeText(roomId)}> 🔗 Copy  </button>
-          <button className="waiting-link-btn" onClick={() => setShowRoomId(!showRoomId)}> {showRoomId ? "🙈 Hide" : "👁️ Show"} </button>
+          <button
+            className="waiting-link-btn"
+            onClick={() => navigator.clipboard.writeText(roomId)}
+          >
+            🔗 Copy
+          </button>
+          <button
+            className="waiting-link-btn"
+            onClick={() => setShowRoomId(!showRoomId)}
+          >
+            {showRoomId ? "🙈 Hide" : "👁️ Show"}
+          </button>
         </div>
 
         <p className="waiting-text">Waiting for players</p>
@@ -155,6 +188,23 @@ export default function WaitingRoomPage(props) {
           </button>
         )}
       </div>
+
+      {/* Guest name input modal */}
+      {showNamePrompt && (
+        <div className="name-prompt-overlay">
+          <div className="name-prompt-box">
+            <h3>Enter your name to join</h3>
+            <input
+              type="text"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              placeholder="Your name"
+              autoFocus
+            />
+            <button onClick={handleJoinAsGuest}>Join Room</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
