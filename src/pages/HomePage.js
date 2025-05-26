@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "../components/Footer";
-import CreateQuiz from "./CreateQuiz";
+import CreateQuiz from "../components/CreateQuizzes";
 import "../styles/homepage.css";
 import socket from "../socket";
 import {
@@ -111,13 +111,21 @@ function Navigation() {
 
 function HeroSection() {
   const [openCreate, setOpenCreate] = useState(false);
-
+  const navigate = useNavigate();
   const handleCreateClose = (quizId) => {
     setOpenCreate(false);
     if (quizId) {
       // redirect nếu cần
     }
   };
+  const handleOpenCreate = () => {
+  const accessToken = localStorage.getItem("accessToken");
+  if (!accessToken) {
+    navigate("/login");
+  } else {
+    setOpenCreate(true);
+  }
+};
 
   return (
     <div className="hero-card create-quiz">
@@ -129,7 +137,7 @@ function HeroSection() {
         />
         <div className="hero-text">
           <h2>Create a quiz</h2>
-          <button className="hero-btn" onClick={() => setOpenCreate(true)}>
+          <button className="hero-btn" onClick={handleOpenCreate}>
             Quiz editor
           </button>
         </div>
@@ -162,8 +170,14 @@ function QuizCard({ quiz, buttonText }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const name = user?.username || "Người chơi";
 
-  const handlePlayNow = async () => {
+const handlePlayNow = async () => {
   const quizId = quiz.id;
+
+  const accessToken = localStorage.getItem("accessToken");
+  if (!accessToken) {
+    navigate("/login");
+    return;
+  }
 
   try {
     const res = await getQuizzesSocket(quizId);
@@ -171,7 +185,6 @@ function QuizCard({ quiz, buttonText }) {
       const questions = res.data.data;
       console.log("🧪 FE gửi questions vào socket:", questions);
 
-      // Gửi quizId + questions vào socket để tạo room
       socket.emit("createRoom", name, quizId, questions);
 
       socket.once("roomCreated", (roomId) => {
@@ -191,6 +204,7 @@ function QuizCard({ quiz, buttonText }) {
     alert("❌ Lỗi khi tạo phòng chơi!");
   }
 };
+
 
   return (
     <div className="quiz-card">

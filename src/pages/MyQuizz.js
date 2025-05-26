@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./HeaderMyquizz";
 import Footer from "../components/Footer";
-import CreateQuiz from "./CreateQuiz";
+import CreateQuiz from "../components/CreateQuizzes";
 import "../styles/myquizz.css";
 import socket from "../socket";
 import {

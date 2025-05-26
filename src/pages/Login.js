@@ -35,7 +35,7 @@
           if (userRole === "admin") {
             navigate("/dashboard");
           } else {
-            navigate("/home");
+            navigate("/Home");
           }
         } catch (error) {
           console.error("Error parsing user:", error);
@@ -104,9 +104,6 @@
                 </Typography>
                 <Typography component="li" variant="body1">
                   Track student progress and performance
-                </Typography>
-                <Typography component="li" variant="body1">
-                  Generate detailed reports and analytics
                 </Typography>
                 <Typography component="li" variant="body1">
                   Share quizzes with your students

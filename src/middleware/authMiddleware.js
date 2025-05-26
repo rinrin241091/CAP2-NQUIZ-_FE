@@ -2,11 +2,14 @@ import { Navigate } from "react-router-dom";
 
 export const RequireAuth = ({ children }) => {
   const accessToken = localStorage.getItem("accessToken");
+  console.log("🛡 RequireAuth running, token:", accessToken);
   if (!accessToken) {
+    console.log("🔁 Redirecting to /login");
     return <Navigate to="/login" />;
   }
   return children;
 };
+
 
 export const RequireAdmin = ({ children }) => {
   const accessToken = localStorage.getItem("accessToken");
@@ -17,7 +20,7 @@ export const RequireAdmin = ({ children }) => {
   }
 
   if (userRole !== "admin") {
-    return <Navigate to="/home" />;
+    return <Navigate to="/Home" />;
   }
 
   return children;

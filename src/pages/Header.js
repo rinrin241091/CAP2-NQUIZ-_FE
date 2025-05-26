@@ -219,13 +219,18 @@ function Header() {
             open={Boolean(settingsAnchorEl)}
             onClose={handleSettingsClose}
           >
-            <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-            <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
-            <MenuItem onClick={handleHistoryClick}>History</MenuItem>
-            {user?.role === "admin" && (
-              <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
+            {user && (
+              <>
+                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
+                <MenuItem onClick={handleHistoryClick}>History</MenuItem>
+                {user?.role === "admin" && (
+                  <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
+                )}
+              </>
             )}
           </Menu>
+
 
           {user ? (
             <button className="sign-in-btn" onClick={handleLogout}>

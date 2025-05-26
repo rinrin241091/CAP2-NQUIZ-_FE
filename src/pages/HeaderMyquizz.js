@@ -81,7 +81,7 @@ function Header() {
   return (
     <header className="header-my-quizzes">
       <div className="main-header">
-        <div className="logo" onClick={() => navigate("/Home")} style={{ cursor: "pointer" }}>
+        <div className="logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
           NQUIZ.com
         </div>
 
@@ -99,13 +99,18 @@ function Header() {
             open={Boolean(settingsAnchorEl)}
             onClose={handleSettingsClose}
           >
-            <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-            <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
-            <MenuItem onClick={handleHistoryClick}>History</MenuItem>
-            {user?.role === "admin" && (
-              <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
+            {user && (
+              <>
+                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                <MenuItem onClick={handleMyQuizzesClick}>My Quizzes</MenuItem>
+                <MenuItem onClick={handleHistoryClick}>History</MenuItem>
+                {user?.role === "admin" && (
+                  <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
+                )}
+              </>
             )}
           </Menu>
+
 
           {user ? (
             <button className="sign-in-btn" onClick={handleLogout}>

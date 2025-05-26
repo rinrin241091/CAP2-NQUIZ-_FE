@@ -21,15 +21,15 @@ import Profile from "./pages/Profile";
 import QuizEditorPage from "./components/QuizEditorPage";
 import OneCorrectAnswer from "./components/OneCorrectAnswer";
 import MultipleCorrectAnswers from "./components/MultipleCorrectAnswers";
-import CreateQuiz from "./pages/CreateQuiz";
-import MyQuizzes from "./pages/MyQuizzes";
+import CreateQuiz from "./components/CreateQuizzes";
+// import MyQuizzes from "./pages/MyQuizzes";
 import QuizSettingsPage from "./components/QuizSettingsPage";
 import WaitingRoomPage from "./components/WaitingRoomPage";
 import Test from "./components/test";
 import GameRoom from "./components/GameRoom";
 import MyQuizz from "./pages/MyQuizz";
 import HistoryQuizzes from "./pages/HistoryQuizzes";
-import QuizReview from './pages/QuizReview'; // hoặc đúng path file bạn tạo
+import QuizReview from './pages/QuizReview'; 
 
 
 
@@ -41,7 +41,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/test" element={<Test />} />
         <Route path="/" element={<HomePage />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/Home" element={<HomePage />} />
 
         <Route path="/math" element={<MathPage />} />
         <Route path="/history" element={<HistoryPage />} />
@@ -82,22 +82,22 @@ function App() {
             </RequireAuth>
           }
         />
-        <Route
+        {/* <Route
           path="/create-quiz"
           element={
             <RequireAuth>
               <CreateQuiz />
             </RequireAuth>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/my-quizzes"
           element={
             <RequireAuth>
               <MyQuizzes />
             </RequireAuth>
           }
-        />
+        /> */}
 
         {/* Admin Routes */}
         <Route
