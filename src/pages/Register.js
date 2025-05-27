@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../services/api";
 import {
   Container,
   Grid,
@@ -11,6 +10,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
+import {sendOtpRegister, register} from "../services/api";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -20,6 +20,9 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -29,6 +32,30 @@ const Register = () => {
     });
   };
 
+  const handleSendOtp = async () => {
+    if (!formData.email) {
+      setError("Please enter your email before requesting OTP.");
+      return;
+    }
+
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!gmailRegex.test(formData.email)) {
+      setError("Email must be a valid Gmail address");
+      return;
+    }
+
+    try {
+      setError("");
+      setSendingOtp(true);
+      await sendOtpRegister(formData.email);
+      setOtpSent(true);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -36,15 +63,18 @@ const Register = () => {
       return;
     }
 
-    // Kiểm tra email có phải dạng Gmail
-    const gmailRegex = /^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$/;
-    if (!gmailRegex.test(formData.email)) {
-      setError("Email must be a valid Gmail address");
+    if (!otp) {
+      setError("Please enter the OTP sent to your email.");
       return;
     }
 
     try {
-      const { confirmPassword, ...registerData } = formData;
+      const registerData = {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        otp,
+      };
       await register(registerData);
       navigate("/login");
     } catch (err) {
@@ -103,17 +133,42 @@ const Register = () => {
                 value={formData.username}
                 onChange={handleChange}
               />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <Button
+                  variant="outlined"
+                  onClick={handleSendOtp}
+                  disabled={sendingOtp}
+                  sx={{ mt: 1.5, height: "56px" }}
+                >
+                  {sendingOtp ? "Sending..." : "Send OTP"}
+                </Button>
+              </Box>
+
+              {otpSent && (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="otp"
+                  label="Enter OTP"
+                  name="otp"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+              )}
+
               <TextField
                 margin="normal"
                 required
@@ -136,6 +191,7 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
+
               <Button
                 type="submit"
                 fullWidth
@@ -164,7 +220,7 @@ const Register = () => {
       </Grid>
       <Box sx={{ mt: 4, textAlign: "center" }}>
         <Typography variant="body2" color="text.secondary">
-          Copyright NQuiz © 2024
+          Copyright NQuiz © 2025
         </Typography>
       </Box>
     </Container>

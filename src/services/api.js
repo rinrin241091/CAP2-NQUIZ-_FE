@@ -43,6 +43,8 @@ api.interceptors.request.use(
 // Auth endpoints
 export const login = (credentials) => api.post("/user/login", credentials);
 export const register = (userData) => api.post("/user/register", userData);
+export const sendOtpRegister = (email) =>
+  api.post('/user/send-otp-register', { email });
 export const forgotPassword = (email) =>
   api.post("/user/forgot-password", { email });
 export const verifyOTP = (email, otp) =>
