@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Header from "./HeaderMyquizz";
 import Footer from "../components/Footer";
 import CreateQuiz from "../components/CreateQuizzes";
@@ -75,8 +76,10 @@ const handlePlayNow = async (quizId) => {
     try {
       await deleteQuiz(quizId);
       setQuizzes((prev) => prev.filter((q) => q.quiz_id !== quizId));
+      toast.success("🗑️ Đã xóa câu hỏi thành công!");
     } catch (error) {
       console.error("Lỗi khi xóa quiz:", error);
+       toast.error("❌ Đã xảy ra lỗi khi xóa.");
     }
   };
 

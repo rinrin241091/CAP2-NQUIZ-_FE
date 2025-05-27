@@ -115,7 +115,15 @@ export const getQuizReview = (userId, quizId) => api.get(`/history/review/${user
 export const getQuizAttemptsByUserAndQuiz = (userId, quizId) =>api.get(`/history/attempts/${userId}/${quizId}`);
 export const getQuizReviewBySession = (sessionId, userId) =>api.get(`/history/review/by-session/${sessionId}/${userId}`);
 
+export const deleteQuestionById = (questionId) =>api.delete(`api/questions/${questionId}`);
+export const getQuestionById = (questionId) => api.get(`/api/questions/${questionId}`);
+export const updateQuestionById = (questionId, data) => api.put(`/api/questions/${questionId}`, data);
 
+export const getAIExplanation = (questionText) => {
+  return api.post("/api/ai/explain", {
+    question: questionText,
+  });
+};
 
 
 export default api;

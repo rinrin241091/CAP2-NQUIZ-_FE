@@ -1,6 +1,10 @@
 // App.js
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
 import "./App.css";
 import HomePage from "./pages/HomePage";
 
@@ -21,15 +25,13 @@ import Profile from "./pages/Profile";
 import QuizEditorPage from "./components/QuizEditorPage";
 import OneCorrectAnswer from "./components/OneCorrectAnswer";
 import MultipleCorrectAnswers from "./components/MultipleCorrectAnswers";
-import CreateQuiz from "./components/CreateQuizzes";
-// import MyQuizzes from "./pages/MyQuizzes";
 import QuizSettingsPage from "./components/QuizSettingsPage";
 import WaitingRoomPage from "./components/WaitingRoomPage";
 import Test from "./components/test";
 import GameRoom from "./components/GameRoom";
 import MyQuizz from "./pages/MyQuizz";
 import HistoryQuizzes from "./pages/HistoryQuizzes";
-import QuizReview from './pages/QuizReview'; // hoặc đúng path file bạn tạo
+import QuizReview from './pages/QuizReview';
 import ShortAnswer from './components/ShortAnswer';
 
 function App() {
@@ -108,6 +110,7 @@ function App() {
           }
         />
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

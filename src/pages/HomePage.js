@@ -136,7 +136,7 @@ function HeroSection() {
           className="hero-image"
         />
         <div className="hero-text">
-          <h2>Create a quiz</h2>
+          <h2> Create a Quiz Now!</h2>
           <button className="hero-btn" onClick={handleOpenCreate}>
             Quiz editor
           </button>

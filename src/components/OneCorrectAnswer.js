@@ -17,8 +17,6 @@ export default function OneCorrectAnswer() {
   const [answers, setAnswers] = React.useState([
     { answer_text: "", is_correct: true },
     { answer_text: "", is_correct: false },
-    { answer_text: "", is_correct: false },
-    { answer_text: "", is_correct: false },
   ]);
   const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const [errorSubmit, setErrorSubmit] = React.useState('');
@@ -132,25 +130,48 @@ export default function OneCorrectAnswer() {
                 <input
                   type="radio"
                   checked={ans.is_correct}
-                  onChange={() => setAnswers([
-                    ...answers.map((a, i) => ({ ...a, is_correct: i === idx }))
-                  ])}
+                  onChange={() =>
+                    setAnswers(answers.map((a, i) => ({
+                      ...a,
+                      is_correct: i === idx
+                    })))
+                  }
                   style={{ marginRight: 8 }}
                 />
                 <input
                   className="input"
                   placeholder={`Đáp án ${idx + 1}`}
                   value={ans.answer_text}
-                  onChange={e => setAnswers([
-                    ...answers.map((a, i) => i === idx ? { ...a, answer_text: e.target.value } : a)
-                  ])}
+                  onChange={e =>
+                    setAnswers(answers.map((a, i) =>
+                      i === idx ? { ...a, answer_text: e.target.value } : a
+                    ))
+                  }
                   style={{ flex: 1 }}
                 />
+                {answers.length > 2 && (
+                  <button
+                    onClick={() => setAnswers(answers.filter((_, i) => i !== idx))}
+                    style={{ backgroundColor: '#f44336', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer' }}
+                  >
+                    Xóa
+                  </button>
+                )}
               </div>
             ))}
-          </div>
 
-          
+            {/* Add Answer Button */}
+            {answers.length < 6 && (
+              <button
+                onClick={() =>
+                  setAnswers([...answers, { answer_text: "", is_correct: false }])
+                }
+                style={{ marginTop: 8, backgroundColor: '#2196f3', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 4, cursor: 'pointer' }}
+              >
+                + Thêm đáp án
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

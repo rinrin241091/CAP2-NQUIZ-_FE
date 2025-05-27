@@ -6,13 +6,16 @@ import { saveGameResults } from "../services/api";
 
 export default function GameRoom() {
   const location = useLocation();
-  const { state } = useLocation();
+  const { state } = location;
   const queryParams = new URLSearchParams(location.search);
   const isHost = queryParams.get("isHost") === "true";
 
   const quizIdRef = useRef(state?.quizId || null);
   const { roomId } = useParams();
   const responseRef = useRef([]);
+  const receivedQuestionRef = useRef(null);
+
+  const [questionIndex, setQuestionIndex] = useState(0); // ✅ Thêm số thứ tự câu hỏi
   const [question, setQuestion] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [options, setOptions] = useState([]);
@@ -30,9 +33,9 @@ export default function GameRoom() {
   const [isPaused, setIsPaused] = useState(false);
   const [shortAnswerText, setShortAnswerText] = useState("");
   const [allResponses, setAllResponses] = useState([]);
+
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  const receivedQuestionRef = useRef(null);
 
   const emitResponse = (response) => {
     setAllResponses((prev) => [...prev, response]);
@@ -43,6 +46,7 @@ export default function GameRoom() {
       if (receivedQuestionRef.current === data.question) return;
       receivedQuestionRef.current = data.question;
       quizIdRef.current = data.quizId || quizIdRef.current;
+
       setQuestion(data.question);
       setOptions(data.answers);
       setQuestionType(data.question_type);
@@ -56,6 +60,7 @@ export default function GameRoom() {
       setStartTime(Date.now());
       setIsPaused(false);
       setShortAnswerText("");
+      setQuestionIndex((prev) => prev + 1); // ✅ Tăng số câu
     });
 
     socket.on("answerResult", (data) => {
@@ -92,12 +97,11 @@ export default function GameRoom() {
           hostId: user?.user_id,
           roomPin: roomId,
           players: data.scores.map((p) => ({ name: p.name, score: p.score })),
-          responses: responseRef.current  // ✅ dùng ref thay vì state
+          responses: responseRef.current,
         });
       } catch (err) {
         console.error("❌ Failed to save game results:", err);
       }
-
     });
 
     socket.on("gamePaused", () => setIsPaused(true));
@@ -135,7 +139,7 @@ export default function GameRoom() {
       playerName: user?.username,
       questionText: question,
       answerIndex: index,
-      timeTaken
+      timeTaken,
     });
     socket.emit("submitAnswer", roomId, index, timeTaken);
   };
@@ -143,7 +147,9 @@ export default function GameRoom() {
   const handleMultipleChoiceToggle = (index) => {
     if (answered) return;
     setSelectedMultiAnswers((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+      prev.includes(index)
+        ? prev.filter((i) => i !== index)
+        : [...prev, index]
     );
   };
 
@@ -151,14 +157,12 @@ export default function GameRoom() {
     if (answered || selectedMultiAnswers.length === 0) return;
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setAnswered(true);
-    // Multiple Choice
     responseRef.current.push({
       playerName: user?.username,
       questionText: question,
       answerIndices: selectedMultiAnswers,
-      timeTaken
+      timeTaken,
     });
-
     socket.emit("submitMultipleAnswers", roomId, selectedMultiAnswers, timeTaken);
   };
 
@@ -166,14 +170,12 @@ export default function GameRoom() {
     if (answered || !shortAnswerText.trim()) return;
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setAnswered(true);
-    // Short Answer
     responseRef.current.push({
       playerName: user?.username,
       questionText: question,
       answerText: shortAnswerText.trim(),
-      timeTaken
+      timeTaken,
     });
-
     socket.emit("submitShortAnswer", roomId, shortAnswerText.trim(), timeTaken);
   };
 
@@ -214,7 +216,8 @@ export default function GameRoom() {
             {options.map((answer, idx) => {
               let className = "game-options";
               if (correctAnswers.includes(idx)) className += " game-correct";
-              if (selectedMultiAnswers.includes(idx)) className += " game-selected-highlight";
+              if (selectedMultiAnswers.includes(idx))
+                className += " game-selected-highlight";
               return (
                 <li key={idx} className="game-li">
                   <button
@@ -244,7 +247,8 @@ export default function GameRoom() {
         {options.map((answer, idx) => {
           let className = "game-options";
           if (correctAnswerIndex === idx) className += " game-correct";
-          if (selectedAnswerIndex === idx) className += " game-selected-highlight";
+          if (selectedAnswerIndex === idx)
+            className += " game-selected-highlight";
           return (
             <li key={idx} className="game-li">
               <button
@@ -301,7 +305,9 @@ export default function GameRoom() {
           </button>
         )}
         <div className="game-question">
-          <p className="game-question-text">{question}</p>
+          <p className="game-question-text">
+            <strong>Câu {questionIndex}:</strong> {question}
+          </p>
         </div>
         {renderOptions()}
       </div>

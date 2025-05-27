@@ -12,11 +12,10 @@ export default function OneCorrectAnswer() {
   const questionTypeId = state?.questionTypeId;
 
   const [questionText, setQuestionText] = React.useState("");
-  const [timeLimit, setTimeLimit] = React.useState(30);
+  const [timeLimit, setTimeLimit] = React.useState(10);
   const [points, setPoints] = React.useState(1);
   const [answers, setAnswers] = React.useState([
     { answer_text: "", is_correct: true },
-    { answer_text: "", is_correct: false },
     { answer_text: "", is_correct: false },
     { answer_text: "", is_correct: false },
   ]);
@@ -58,19 +57,19 @@ export default function OneCorrectAnswer() {
       {/* Header */}
       <div className="one-header">
         <div className="one-header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
+          <h1>NQUIZ</h1>
           <button className="btn-back-one" onClick={() => navigate(`/quiz-editor/${quizId}`)}>
             ← Back to Quiz
           </button>
         </div>
         <div className="one-header-right">
-          <button className="btn-preview-one">Xem trước</button>
+          {/* <button className="btn-preview-one">Xem trước</button> */}
           <button
             className="btn-done-one"
             onClick={handleSubmitQuestion}
             disabled={loadingSubmit}
           >
-            {loadingSubmit ? 'Đang lưu...' : 'Hoàn thành'}
+            {loadingSubmit ? 'Đang lưu...' : 'Done'}
           </button>
         </div>
       </div>
@@ -130,40 +129,68 @@ export default function OneCorrectAnswer() {
             {answers.map((ans, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <input
-                  type="checkbox"
+                  type="checkbox" // ✅ Chỉnh từ radio sang checkbox
                   checked={ans.is_correct}
-                  onChange={() => setAnswers([
-                    ...answers.map((a, i) => ({ ...a, is_correct: i === idx ? !a.is_correct : a.is_correct }))
-                  ])}
+                  onChange={() =>
+                    setAnswers(
+                      answers.map((a, i) =>
+                        i === idx ? { ...a, is_correct: !a.is_correct } : a
+                      )
+                    )
+                  }
                   style={{ marginRight: 8 }}
                 />
                 <input
                   className="input"
                   placeholder={`Đáp án ${idx + 1}`}
                   value={ans.answer_text}
-                  onChange={e => setAnswers([
-                    ...answers.map((a, i) => i === idx ? { ...a, answer_text: e.target.value } : a)
-                  ])}
+                  onChange={e =>
+                    setAnswers(
+                      answers.map((a, i) =>
+                        i === idx ? { ...a, answer_text: e.target.value } : a
+                      )
+                    )
+                  }
                   style={{ flex: 1 }}
                 />
+                {answers.length > 3 && (
+                  <button
+                    onClick={() => setAnswers(answers.filter((_, i) => i !== idx))}
+                    style={{
+                      backgroundColor: '#f44336',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '4px 8px',
+                      borderRadius: 4,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Xóa
+                  </button>
+                )}
               </div>
             ))}
-          </div>
 
-          
+            {answers.length < 6 && (
+              <button
+                onClick={() =>
+                  setAnswers([...answers, { answer_text: "", is_correct: false }])
+                }
+                style={{
+                  marginTop: 8,
+                  backgroundColor: '#2196f3',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: 4,
+                  cursor: 'pointer'
+                }}
+              >
+                + Thêm đáp án
+              </button>
+            )}
+          </div>          
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="one-footer">
-        <button
-          className="btn-settings-one"
-          type="button"
-          onClick={() => navigate("/quiz-settings")}
-        >
-          Cài đặt
-        </button>
-        <button className="btn-add-slide-one">+</button>
       </div>
     </div>
   );

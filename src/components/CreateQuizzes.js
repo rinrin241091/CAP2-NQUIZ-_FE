@@ -78,23 +78,29 @@ const handleSubmit = async (e) => {
 };
 
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const storedUser = localStorage.getItem('user');
-        const user = storedUser ? JSON.parse(storedUser) : null;
-        const user_id = user ? user.id : null;
-        if (!user_id) return;
-        const res = await axiosInstance.get('/categories', {
-          params: { user_id }
-        });
-        setCategories((res.data?.data && Array.isArray(res.data.data)) ? res.data.data : []);
-      } catch (err) {
-        console.error('Lỗi khi lấy danh mục:', err);
-      }
-    };
-    fetchCategories();
-  }, []);
+useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      const user = storedUser ? JSON.parse(storedUser) : null;
+      const user_id = user ? user.user_id : null; // 🔄 Sửa từ user.id => user.user_id
+      if (!user_id) return;
+
+      const res = await axiosInstance.get('/categories', {
+        params: { user_id }
+      });
+
+      setCategories(
+        Array.isArray(res.data?.data) ? res.data.data : []
+      );
+    } catch (err) {
+      console.error('Lỗi khi lấy danh mục:', err);
+    }
+  };
+
+  fetchCategories();
+}, []);
+
 
   useEffect(() => {
     if (categories.length > 0 && !formData.category_id) {

@@ -1,38 +1,27 @@
 // QuizEditorPage.js
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../assets/styles/QuizEditorPage.css";
 import axiosInstance from '../services/axiosConfig';
-
-import {
-  CheckSquare,
-  Square,
-  ListOrdered,
-  Sliders,
-  MapPin,
-  Image as ImageIcon,
-  FileText,
-  Bot,
-  Info,
-  Edit,
-  Trash,
-} from "lucide-react";
+import { Edit, Trash } from "lucide-react";
+import { deleteQuestionById, getQuestionById, updateQuestionById } from "../services/api";
 
 export default function QuizEditorPage() {
   const navigate = useNavigate();
   const { quizId } = useParams();
 
-  console.log('QuizEditorPage - quizId:', quizId);
-
   const [questionTypes, setQuestionTypes] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [errorQuestions, setErrorQuestions] = useState('');
-
   const [currentPage, setCurrentPage] = useState(1);
-  const questionsPerPage = 10;
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedQuestionId, setSelectedQuestionId] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
 
-  // Calculate the current questions to display
+  const questionsPerPage = 10;
   const indexOfLastQuestion = currentPage * questionsPerPage;
   const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
   const currentQuestions = questions.slice(indexOfFirstQuestion, indexOfLastQuestion);
@@ -51,50 +40,57 @@ export default function QuizEditorPage() {
     fetchQuestionTypes();
   }, []);
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      if (!quizId) {
-        setLoadingQuestions(false);
-        return;
-      }
-      setLoadingQuestions(true);
-      setErrorQuestions('');
-      try {
-        const res = await axiosInstance.get(`/api/quizzes/${quizId}/questions`);
-        console.log('Questions API response:', res.data);
-        setQuestions(Array.isArray(res.data) ? res.data : res.data?.data || []);
-      } catch (err) {
-        setErrorQuestions('Không thể tải danh sách câu hỏi.');
-        setQuestions([]);
-      } finally {
-        setLoadingQuestions(false);
-      }
-    };
-    fetchQuestions();
-  }, [quizId]);
-
-  const handleSlideClick = (slideType) => {
-    if (slideType === "Buttons") {
-      if (window.location.pathname !== "/one-correct-answer") {
-        navigate("/one-correct-answer");
-      }
-    } else if (slideType === "Checkboxes") {
-      if (window.location.pathname !== "/multiple-correct-answers") {
-        navigate("/multiple-correct-answers");
-      }
-    } else {
-      alert(`Slide type "${slideType}" chưa được hỗ trợ.`);
+  const fetchQuestions = async () => {
+    if (!quizId) {
+      setLoadingQuestions(false);
+      return;
+    }
+    setLoadingQuestions(true);
+    setErrorQuestions('');
+    try {
+      const res = await axiosInstance.get(`/api/quizzes/${quizId}/questions`);
+      setQuestions(Array.isArray(res.data) ? res.data : res.data?.data || []);
+    } catch (err) {
+      setErrorQuestions('Không thể tải danh sách câu hỏi.');
+      setQuestions([]);
+    } finally {
+      setLoadingQuestions(false);
     }
   };
 
-  const handleEdit = (questionId) => {
-    // Logic to edit the question
-    console.log(`Edit question with ID: ${questionId}`);
+  useEffect(() => {
+    fetchQuestions();
+  }, [quizId]);
+
+  const handleDeleteConfirmed = async () => {
+    try {
+      const response = await deleteQuestionById(selectedQuestionId);
+      if (response.data?.success) {
+        setQuestions(prev => prev.filter(q => q.question_id !== selectedQuestionId));
+        toast.success("🗑️ Đã xóa câu hỏi thành công!");
+      } else {
+        toast.error("❌ Không thể xóa câu hỏi.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa câu hỏi:", error);
+      toast.error("❌ Đã xảy ra lỗi khi xóa.");
+    } finally {
+      setShowConfirm(false);
+      setSelectedQuestionId(null);
+    }
   };
 
-  const handleDelete = (questionId) => {
-    // Logic to delete the question
-    console.log(`Delete question with ID: ${questionId}`);
+  const handleEdit = async (questionId) => {
+    try {
+      const res = await getQuestionById(questionId);
+      if (res.data.question_type_id === 3 && (!res.data.answers || res.data.answers.length === 0)) {
+        res.data.answers = [{ answer_text: "", is_correct: true }];
+      }
+      setEditFormData(res.data);
+      setShowEditModal(true);
+    } catch (err) {
+      alert("Không thể tải dữ liệu câu hỏi để chỉnh sửa.");
+    }
   };
 
   const handleNextPage = () => {
@@ -113,16 +109,10 @@ export default function QuizEditorPage() {
     <div className="quiz-editor-container">
       <div className="quiz-editor-header">
         <div className="quiz-editor-header-left">
-          <h1 className="logo" onClick={() => navigate("/")} >NQUIZ</h1>
-          <button
-            className="btn-back-editor"
-            onClick={() => navigate("/")}
-          >
-            ← Back to Home
-          </button>
+          <h1 className="logo-quiz-editor" onClick={() => navigate("/")}>NQUIZ</h1>
+          <button className="btn-back-editor" onClick={() => navigate("/")}>← Back to Home</button>
         </div>
         <div className="quiz-editor-header-right">
-          {/* <button className="btn-preview-editor">Preview</button> */}
           <button className="btn-done-editor">Done</button>
         </div>
       </div>
@@ -132,16 +122,21 @@ export default function QuizEditorPage() {
         <div className="slide-types-grid">
           {questionTypes.map((type) => {
             const handleClick = () => {
-              if (type.question_type_id === 1) {
-                navigate(`/one-correct-answer/${quizId}`, { state: { quizId: quizId,questionTypeId: type.question_type_id } });
-              } else if (type.question_type_id === 2) {
-                navigate(`/multiple-correct-answers/${quizId}`, { state: { quizId: quizId, questionTypeId: type.question_type_id } });
-              } else if (type.question_type_id === 3) {
-                navigate(`/short-answer/${quizId}`, { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+              const routeMap = {
+                1: "/one-correct-answer",
+                2: "/multiple-correct-answers",
+                3: "/short-answer"
+              };
+              const path = routeMap[type.question_type_id];
+              if (path) {
+                navigate(`${path}/${quizId}`, {
+                  state: { quizId, questionTypeId: type.question_type_id }
+                });
               } else {
                 alert('Chức năng này chưa hỗ trợ!');
               }
             };
+
             return (
               <div
                 key={type.question_type_id}
@@ -171,7 +166,13 @@ export default function QuizEditorPage() {
                 <p><strong>{question.question_text}</strong></p>
                 <div className="question-actions">
                   <Edit className="icon edit-icon" onClick={() => handleEdit(question.question_id)} />
-                  <Trash className="icon delete-icon" onClick={() => handleDelete(question.question_id)} />
+                  <Trash
+                    className="icon delete-icon"
+                    onClick={() => {
+                      setSelectedQuestionId(question.question_id);
+                      setShowConfirm(true);
+                    }}
+                  />
                 </div>
               </li>
             ))}
@@ -187,18 +188,144 @@ export default function QuizEditorPage() {
         </div>
       )}
 
-      {/* <div className="quiz-editor-footer">
-        
-        <button
-          className="btn-settings-editor"
-          type="button"
-          onClick={() => navigate("/quiz-settings")}
-        >
-          Settings
-        </button>
+      {showConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>Bạn có chắc chắn muốn xóa câu hỏi này?</p>
+            <div className="modal-actions">
+              <button onClick={handleDeleteConfirmed}>Xóa</button>
+              <button onClick={() => setShowConfirm(false)}>Hủy</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-        <button className="btn-add-slide-editor">+</button>
-      </div> */}
+      {showEditModal && editFormData && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Chỉnh sửa câu hỏi</h3>
+
+            <label>Nội dung câu hỏi</label>
+            <textarea
+              className="full-width-input"
+              value={editFormData.question_text}
+              onChange={e => setEditFormData({ ...editFormData, question_text: e.target.value })}
+            />
+
+            <label>Thời gian (giây)</label>
+            <input
+              type="number"
+              className="full-width-input"
+              value={editFormData.time_limit}
+              onChange={e => setEditFormData({ ...editFormData, time_limit: Number(e.target.value) })}
+            />
+
+            {editFormData.question_type_id === 3 ? (
+              <>
+                <label>Đáp án đúng (Trả lời ngắn)</label>
+                <input
+                  type="text"
+                  className="full-width-input"
+                  value={editFormData.answers?.[0]?.answer_text || ""}
+                  onChange={e => {
+                    const newAnswer = { answer_text: e.target.value, is_correct: true };
+                    setEditFormData({ ...editFormData, answers: [newAnswer] });
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <label>Đáp án</label>
+                {editFormData.answers.map((ans, idx) => (
+                  <div key={idx} className="answer-row">
+                    <input
+                      type={editFormData.question_type_id === 2 ? "checkbox" : "radio"}
+                      checked={ans.is_correct}
+                      onChange={() => {
+                        const updatedAnswers = editFormData.answers.map((a, i) => ({
+                          ...a,
+                          is_correct:
+                            editFormData.question_type_id === 2
+                              ? i === idx
+                                ? !a.is_correct
+                                : a.is_correct
+                              : i === idx,
+                        }));
+                        setEditFormData({ ...editFormData, answers: updatedAnswers });
+                      }}
+                      className="answer-checkbox"
+                    />
+                    <input
+                      type="text"
+                      value={ans.answer_text}
+                      onChange={e => {
+                        const updatedAnswers = [...editFormData.answers];
+                        updatedAnswers[idx].answer_text = e.target.value;
+                        setEditFormData({ ...editFormData, answers: updatedAnswers });
+                      }}
+                      className="answer-input"
+                    />
+                    {editFormData.answers.length > 2 && (
+                      <button
+                        onClick={() => {
+                          const updatedAnswers = editFormData.answers.filter((_, i) => i !== idx);
+                          setEditFormData({ ...editFormData, answers: updatedAnswers });
+                        }}
+                        className="answer-delete"
+                        title="Xóa đáp án"
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                <button
+                  className="add-answer-btn"
+                  onClick={() => {
+                    if (editFormData.answers.length < 6) {
+                      const newAnswer = { answer_text: "", is_correct: false };
+                      setEditFormData({
+                        ...editFormData,
+                        answers: [...editFormData.answers, newAnswer]
+                      });
+                    } else {
+                      toast.warn("Chỉ được tối đa 6 đáp án");
+                    }
+                  }}
+                  disabled={editFormData.answers.length >= 6}
+                >
+                  ➕ Thêm đáp án
+                </button>
+              </>
+            )}
+
+            <div className="modal-actions">
+              <button
+                onClick={async () => {
+                  try {
+                    await updateQuestionById(editFormData.question_id, {
+                      ...editFormData,
+                      time_limit: Number(editFormData.time_limit),
+                      points: Number(editFormData.points),
+                    });
+
+                    toast.success("Cập nhật thành công!");
+                    setShowEditModal(false);
+                    setEditFormData(null);
+                    fetchQuestions();
+                  } catch {
+                    toast.error("Lỗi khi cập nhật.");
+                  }
+                }}
+              >
+                Lưu
+              </button>
+              <button onClick={() => setShowEditModal(false)}>Hủy</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

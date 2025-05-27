@@ -78,3 +78,38 @@
 .footer-column a:hover {
   text-decoration: underline;
 }
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 0 10px;
+  }
+
+  .discord-logo {
+    width: 130px;
+  }
+
+  .discord-text {
+    font-size: 16px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .footer-column {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-column h4 {
+    font-size: 18px;
+  }
+
+  .footer-column a {
+    font-size: 15px;
+  }
+}
