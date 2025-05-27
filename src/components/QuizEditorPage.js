@@ -179,9 +179,9 @@ export default function QuizEditorPage() {
               if (type.question_type_id === 1) {
                 navigate(`/one-correct-answer/${quizId}`, { state: { quizId: quizId,questionTypeId: type.question_type_id } });
               } else if (type.question_type_id === 2) {
-                navigate('/multiple-correct-answers', { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+                navigate(`/multiple-correct-answers/${quizId}`, { state: { quizId: quizId, questionTypeId: type.question_type_id } });
               } else if (type.question_type_id === 3) {
-                navigate('/short-answer', { state: { quizId: quizId, questionTypeId: type.question_type_id } });
+                navigate(`/short-answer/${quizId}`, { state: { quizId: quizId, questionTypeId: type.question_type_id } });
               } else {
                 alert('Chức năng này chưa hỗ trợ!');
               }
