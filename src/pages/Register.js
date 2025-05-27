@@ -37,7 +37,7 @@ const Register = () => {
     }
 
     // Kiểm tra email có phải dạng Gmail
-    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    const gmailRegex = /^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$/;
     if (!gmailRegex.test(formData.email)) {
       setError("Email must be a valid Gmail address");
       return;

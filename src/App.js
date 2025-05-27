@@ -29,10 +29,8 @@ import Test from "./components/test";
 import GameRoom from "./components/GameRoom";
 import MyQuizz from "./pages/MyQuizz";
 import HistoryQuizzes from "./pages/HistoryQuizzes";
-import QuizReview from './pages/QuizReview'; 
-
-
-
+import QuizReview from './pages/QuizReview'; // hoặc đúng path file bạn tạo
+import ShortAnswer from './components/ShortAnswer';
 
 function App() {
   return (
@@ -56,7 +54,7 @@ function App() {
         <Route path="/quiz-editor/:quizId" element={<QuizEditorPage />} />
         <Route path="/one-correct-answer/:quizId" element={<OneCorrectAnswer />} />
         <Route
-          path="/multiple-correct-answers"
+          path="/multiple-correct-answers/:quizId"
           element={<MultipleCorrectAnswers />}
         />
         <Route path="/quiz-settings" element={<QuizSettingsPage />} />
@@ -65,6 +63,7 @@ function App() {
         <Route path="/my-quizz" element={<MyQuizz />} />
         <Route path="/history-quizzes" element={<HistoryQuizzes />} />
         <Route path="/quiz-review/:quizId" element={<QuizReview />} />
+        <Route path="/short-answer/:quizId" element={<ShortAnswer />} />
         {/* Protected Routes */}
         <Route
           path="/dashboard"
