@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 // URL backend socket (Render backend hoặc localhost khi dev)
-const socket = io(process.env.REACT_APP_SOCKET_URL || "http://localhost:3000", {
+const socket = io(https://cap2-nquiz-be.onrender.com, {
   transports: ['websocket'],
   withCredentials: true
 });
