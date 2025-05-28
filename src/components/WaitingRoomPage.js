@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import QRCode from "react-qr-code"; // ✅ Thêm dòng này
 import "../assets/styles/WaitingRoomPage.css";
 import socket from "../socket";
 import { playQuiz } from "../services/api";
@@ -24,11 +25,10 @@ export default function WaitingRoomPage(props) {
   const [hasJoined, setHasJoined] = useState(false);
 
   useEffect(() => {
-    // Gửi joinRoom nếu chưa join và không phải host
     if (!hasJoined && !isHost && roomId) {
       const storedUser = localStorage.getItem("user");
       if (!storedUser || storedUser === "undefined") {
-        setShowNamePrompt(true); // Hiện form nhập tên
+        setShowNamePrompt(true);
       } else {
         const username = JSON.parse(storedUser)?.username;
         if (username) {
@@ -38,7 +38,6 @@ export default function WaitingRoomPage(props) {
       }
     }
 
-    // Lắng nghe danh sách người chơi cập nhật
     socket.on("updatePlayers", (playersList) => {
       setPlayers(playersList);
     });
@@ -122,35 +121,48 @@ export default function WaitingRoomPage(props) {
     }
   };
 
+  const roomUrl = `${window.location.origin}/waiting-room/${roomId}`;
+
   return (
     <div className="waiting-wrapper">
       <div className="left-panel">
-        <p className="waiting-pin-label">PIN code:</p>
-        {showRoomId ? (
-          <p className="waiting-pin-number">{roomId}</p>
-        ) : (
-          <p className="waiting-pin-number">••••••</p>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div>
+            <p className="waiting-pin-label">PIN code:</p>
+            {showRoomId ? (
+              <p className="waiting-pin-number">{roomId}</p>
+            ) : (
+              <p className="waiting-pin-number">••••••</p>
+            )}
+            
+            <div className="waiting-pin-actions">
+              <button
+                className="waiting-link-btn"
+                onClick={() => navigator.clipboard.writeText(roomId)}
+              >
+                🔗 Copy
+              </button>
+              <button
+                className="waiting-link-btn"
+                onClick={() => setShowRoomId(!showRoomId)}
+              >
+                {showRoomId ? "🙈 Hide" : "👁️ Show"}
+              </button>
+            </div>
+          </div>
+
+          {/* QR Code bên phải của PIN */}
+          <div style={{ textAlign: "center", padding: "10px" }}>
+            <p style={{ fontWeight: "bold", marginBottom: 8 }}>Scan to join</p>
+            <QRCode value={roomUrl} size={160} />
+          </div>
+        </div>
         <button
           className="waiting-start-btn"
           onClick={() => (window.location.href = "http://localhost:3001")}
         >
           HomePage
         </button>
-        <div className="waiting-pin-actions">
-          <button
-            className="waiting-link-btn"
-            onClick={() => navigator.clipboard.writeText(roomId)}
-          >
-            🔗 Copy
-          </button>
-          <button
-            className="waiting-link-btn"
-            onClick={() => setShowRoomId(!showRoomId)}
-          >
-            {showRoomId ? "🙈 Hide" : "👁️ Show"}
-          </button>
-        </div>
 
         <p className="waiting-text">Waiting for players</p>
 
@@ -196,7 +208,6 @@ export default function WaitingRoomPage(props) {
         )}
       </div>
 
-      {/* Guest name input modal */}
       {showNamePrompt && (
         <div className="name-prompt-overlay">
           <div className="name-prompt-box">
