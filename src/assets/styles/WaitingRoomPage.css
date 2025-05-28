@@ -317,5 +317,20 @@
     transform: translateY(0);
   }
 }
+.kick-btn {
+  margin-left: 10px;
+  background-color: #f87171; /* đỏ nhạt */
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.kick-btn:hover {
+  background-color: #dc2626; /* đỏ đậm khi hover */
+}
 
 

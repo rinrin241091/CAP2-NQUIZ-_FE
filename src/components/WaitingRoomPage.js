@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import QRCode from "react-qr-code"; // ✅ Thêm dòng này
+import QRCode from "react-qr-code";
 import "../assets/styles/WaitingRoomPage.css";
 import socket from "../socket";
 import { playQuiz } from "../services/api";
@@ -22,24 +22,26 @@ export default function WaitingRoomPage(props) {
 
   const [playerName, setPlayerName] = useState("");
   const [showNamePrompt, setShowNamePrompt] = useState(false);
-  const [hasJoined, setHasJoined] = useState(false);
+  const hasJoinedRef = useRef(false);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    if (!hasJoined && !isHost && roomId) {
-      const storedUser = localStorage.getItem("user");
-      if (!storedUser || storedUser === "undefined") {
+    if (!hasJoinedRef.current && !isHost && roomId) {
+      if (!user) {
         setShowNamePrompt(true);
       } else {
-        const username = JSON.parse(storedUser)?.username;
-        if (username) {
-          socket.emit("joinRoom", roomId, username);
-          setHasJoined(true);
-        }
+        socket.emit("joinRoom", roomId, user.username);
+        hasJoinedRef.current = true;
       }
     }
 
     socket.on("updatePlayers", (playersList) => {
       setPlayers(playersList);
+    });
+
+    socket.on("kicked", () => {
+      alert("Bạn đã bị host mời ra khỏi phòng.");
+      navigate("/Home");
     });
 
     socket.on("gameStarted", () => {
@@ -80,8 +82,9 @@ export default function WaitingRoomPage(props) {
       socket.off("gameStarted");
       socket.off("newQuestion");
       socket.off("currentQuestion");
+      socket.off("kicked");
     };
-  }, [roomId, navigate, isHost, hasJoined]);
+  }, [roomId, navigate, isHost]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -102,7 +105,6 @@ export default function WaitingRoomPage(props) {
 
   const handleStartGame = async () => {
     try {
-      console.log("Việt gửi khi bấm start:", quizId);
       await playQuiz(quizId);
       socket.emit("startGame", roomId);
     } catch (error) {
@@ -115,10 +117,14 @@ export default function WaitingRoomPage(props) {
     if (playerName.trim()) {
       socket.emit("joinRoom", roomId, playerName.trim());
       setShowNamePrompt(false);
-      setHasJoined(true);
+      hasJoinedRef.current = true;
     } else {
       alert("Please enter your name");
     }
+  };
+
+  const handleKickPlayer = (socketId) => {
+    socket.emit("kickPlayer", roomId, socketId);
   };
 
   const roomUrl = `${window.location.origin}/waiting-room/${roomId}`;
@@ -134,7 +140,7 @@ export default function WaitingRoomPage(props) {
             ) : (
               <p className="waiting-pin-number">••••••</p>
             )}
-            
+
             <div className="waiting-pin-actions">
               <button
                 className="waiting-link-btn"
@@ -151,51 +157,53 @@ export default function WaitingRoomPage(props) {
             </div>
           </div>
 
-          {/* QR Code bên phải của PIN */}
           <div style={{ textAlign: "center", padding: "10px" }}>
             <p style={{ fontWeight: "bold", marginBottom: 8 }}>Scan to join</p>
             <QRCode value={roomUrl} size={160} />
           </div>
         </div>
-        <button
-          className="waiting-start-btn"
-          onClick={() => (window.location.href = "http://localhost:3001")}
-        >
-          HomePage
-        </button>
 
+        <button className="waiting-start-btn" onClick={() => navigate("/")}>HomePage</button>
         <p className="waiting-text">Waiting for players</p>
 
-        <div
-          className={`players-list ${isTwoColumns ? "two-columns" : ""}`}
-          ref={containerRef}
-        >
+        <div className={`players-list ${isTwoColumns ? "two-columns" : ""}`} ref={containerRef}>
           {players.length === 0 ? (
             <p>No players have joined yet.</p>
           ) : isTwoColumns ? (
             <>
               <div className="column">
                 {leftColumn.map((player, index) => (
-                  <p key={index} className="player-name" style={playerStyle}>
-                    {player.name}{" "}
-                    {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                  <p key={`${player.id || player.name}-${index}`} className="player-name" style={playerStyle}>
+                    {player.name} {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                    {isHost && player.name !== user?.username && (
+                      <button onClick={() => handleKickPlayer(player.id)} style={{ marginLeft: 8 }}>Kick</button>
+                    )}
                   </p>
                 ))}
               </div>
               <div className="column">
                 {rightColumn.map((player, index) => (
-                  <p key={index} className="player-name" style={playerStyle}>
-                    {player.name}{" "}
-                    {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                  <p key={`${player.id || player.name}-${index}`} className="player-name" style={playerStyle}>
+                    {player.name} {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                    {isHost && player.name !== user?.username && (
+                      <button onClick={() => handleKickPlayer(player.id)} style={{ marginLeft: 8 }}>Kick</button>
+                    )}
                   </p>
                 ))}
               </div>
             </>
           ) : (
             players.map((player, index) => (
-              <p key={index} className="player-name" style={playerStyle}>
-                {player.name}{" "}
-                {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+              <p key={`${player.id || player.name}-${index}`} className="player-name" style={playerStyle}>
+                {player.name} {player.status === "waiting" ? "🕒 Waiting" : "🎮 Playing"}
+                {isHost && player.name !== user?.username && (
+                 <button
+                  className="kick-btn"
+                  onClick={() => handleKickPlayer(player.id)}
+                >
+                  Kick
+                </button>
+                )}
               </p>
             ))
           )}

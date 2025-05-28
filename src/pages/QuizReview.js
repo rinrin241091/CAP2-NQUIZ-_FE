@@ -47,6 +47,7 @@ export default function QuizResultView() {
           user.user_id
         );
         const result = res.data?.data || [];
+         console.log("📥 Kết quả review:", result);
         setQuestions(result);
       } catch (err) {
         console.error("❌ Lỗi khi lấy dữ liệu review:", err);
@@ -96,12 +97,13 @@ export default function QuizResultView() {
             value={selectedSession}
             onChange={(e) => setSelectedSession(Number(e.target.value))}
           >
-            {sessions.map((s) => (
-              <option key={s.session_id} value={s.session_id}>
+            {sessions.map((s, idx) => (
+              <option key={`${s.session_id}-${idx}`} value={s.session_id}>
                 {new Date(s.start_time).toLocaleString()} - Score: {s.score}
               </option>
             ))}
           </select>
+
         </div>
       )}
 

@@ -40,6 +40,11 @@ export default function GameRoom() {
   const emitResponse = (response) => {
     setAllResponses((prev) => [...prev, response]);
   };
+useEffect(() => {
+  setSelectedAnswerIndex(null);
+  setSelectedMultiAnswers([]);
+  setAnswered(false);
+}, [question]);
 
   useEffect(() => {
     socket.on("newQuestion", (data) => {
@@ -96,13 +101,14 @@ export default function GameRoom() {
           quizId,
           hostId: user?.user_id,
           roomPin: roomId,
-          players: data.scores.map((p) => ({ name: p.name, score: p.score })),
+          players: data.scores,
           responses: responseRef.current,
         });
       } catch (err) {
         console.error("❌ Failed to save game results:", err);
       }
     });
+
 
     socket.on("gamePaused", () => setIsPaused(true));
     socket.on("gameResumed", () => {
@@ -136,11 +142,13 @@ export default function GameRoom() {
     setSelectedAnswerIndex(index);
     setAnswered(true);
     responseRef.current.push({
+      userId: user?.user_id, // 🆕 thêm dòng này
       playerName: user?.username,
       questionText: question,
       answerIndex: index,
       timeTaken,
     });
+
     socket.emit("submitAnswer", roomId, index, timeTaken);
   };
 
@@ -158,11 +166,13 @@ export default function GameRoom() {
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setAnswered(true);
     responseRef.current.push({
+      userId: user?.user_id, // 🆕 thêm dòng này
       playerName: user?.username,
       questionText: question,
       answerIndices: selectedMultiAnswers,
       timeTaken,
     });
+
     socket.emit("submitMultipleAnswers", roomId, selectedMultiAnswers, timeTaken);
   };
 
@@ -171,11 +181,13 @@ export default function GameRoom() {
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     setAnswered(true);
     responseRef.current.push({
+      userId: user?.user_id, // 🆕 thêm dòng này
       playerName: user?.username,
       questionText: question,
       answerText: shortAnswerText.trim(),
       timeTaken,
     });
+
     socket.emit("submitShortAnswer", roomId, shortAnswerText.trim(), timeTaken);
   };
 

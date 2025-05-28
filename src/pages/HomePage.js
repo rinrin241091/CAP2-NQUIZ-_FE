@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import Header from "./Header";
 import Footer from "../components/Footer";
 import CreateQuiz from "../components/CreateQuizzes";
@@ -112,12 +113,15 @@ function Navigation() {
 function HeroSection() {
   const [openCreate, setOpenCreate] = useState(false);
   const navigate = useNavigate();
-  const handleCreateClose = (quizId) => {
-    setOpenCreate(false);
-    if (quizId) {
-      // redirect nếu cần
-    }
-  };
+
+const handleCreateClose = (quizId) => {
+  setOpenCreate(false);
+  if (quizId) {
+    toast.success("🎉 Quiz đã được tạo thành công!");
+    navigate(`/quiz-editor/${quizId}`);
+  }
+};
+
   const handleOpenCreate = () => {
   const accessToken = localStorage.getItem("accessToken");
   if (!accessToken) {

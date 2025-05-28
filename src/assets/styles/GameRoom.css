@@ -349,3 +349,27 @@
     font-size: 1.1rem;
   }
 }
+@media (max-width: 480px) {
+  .winner {
+    font-size: 2rem;
+  }
+
+  .game-final-report table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .game-final-report th,
+  .game-final-report td {
+    font-size: 1rem;
+    padding: 12px 8px;
+    white-space: nowrap;
+  }
+
+  .back-home-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+  }
+}

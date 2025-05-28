@@ -22,21 +22,22 @@ function MyQuizz() {
   const user = JSON.parse(localStorage.getItem("user"));
   const name = user?.username || "Người chơi";
 
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const userId = localStorage.getItem("user_ID");
-        if (!userId) return console.error("User ID not found");
+const fetchQuizzes = async () => {
+  try {
+    const userId = localStorage.getItem("user_ID");
+    if (!userId) return console.error("User ID not found");
 
-        const res = await getQuizzesByUser(userId);
-        setQuizzes(res.data.data || []);
-      } catch (error) {
-        console.error("Failed to load quizzes:", error);
-      }
-    };
+    const res = await getQuizzesByUser(userId);
+    setQuizzes(res.data.data || []);
+  } catch (error) {
+    console.error("Failed to load quizzes:", error);
+  }
+};
 
-    fetchQuizzes();
-  }, []);
+useEffect(() => {
+  fetchQuizzes();
+}, []);
+
 
 const handlePlayNow = async (quizId) => {
   try {
@@ -65,12 +66,15 @@ const handlePlayNow = async (quizId) => {
   }
 };
 
-  const handleCreateClose = (quizId) => {
-    setOpenCreate(false);
-    if (quizId) {
-      // redirect nếu cần
-    }
-  };
+const handleCreateClose = (quizId) => {
+  setOpenCreate(false);
+  if (quizId) {
+    toast.success("🎉 Quiz đã được tạo thành công!");
+    navigate(`/quiz-editor/${quizId}`);
+  } else {
+    fetchQuizzes();
+  }
+};
 
   const handleDelete = async (quizId) => {
     try {
