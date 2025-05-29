@@ -33,7 +33,8 @@ import MyQuizz from "./pages/MyQuizz";
 import HistoryQuizzes from "./pages/HistoryQuizzes";
 import QuizReview from './pages/QuizReview';
 import ShortAnswer from './components/ShortAnswer';
-
+// import CategoryManager from './pages/admin/CategoryManager';
+// import CreateQuiz from './pages/admin/CreateQuiz';
 function App() {
   return (
     <div className="app">
@@ -66,6 +67,8 @@ function App() {
         <Route path="/history-quizzes" element={<HistoryQuizzes />} />
         <Route path="/quiz-review/:quizId" element={<QuizReview />} />
         <Route path="/short-answer/:quizId" element={<ShortAnswer />} />
+        {/* <Route path="/category-manager" element={<CategoryManager />} />
+        <Route path="/create-quiz" element={<CreateQuiz />} /> */}
         {/* Protected Routes */}
         <Route
           path="/dashboard"

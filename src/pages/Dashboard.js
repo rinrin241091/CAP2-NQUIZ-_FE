@@ -5,6 +5,9 @@ import {
   Grid,
   Typography,
   CircularProgress,
+  Tabs,
+  Tab,
+  Paper,
 } from "@mui/material";
 import { Assessment, People, Timeline } from "@mui/icons-material";
 import {
@@ -19,6 +22,10 @@ import {
 } from "recharts";
 import HeaderDashboard from "./admin/HeaderDashboard";
 import UserManagement from "../pages/admin/UserManagement";
+import AdminQuizManagement from "../pages/admin/AdminQuizManagement";
+import AdminQuestionManagement from "../pages/admin/AdminQuestionManagement.jsx";
+import AdminAnswerManagement from "../pages/admin/AdminAnswerManagement";
+
 import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +35,10 @@ import {
   getTotalQuizzes,
   getTotalPlays,
   getChartData,
-} from "../services/api"; // Đảm bảo file này export đủ
+  adminGetQuestionById,
+  adminUpdateQuestionById,
+  adminDeleteQuestionById
+} from "../services/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -40,6 +50,11 @@ const Dashboard = () => {
   });
   const [performanceData, setPerformanceData] = useState([]);
   const [selectedRange, setSelectedRange] = useState("7days");
+
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -207,8 +222,30 @@ const Dashboard = () => {
           </Grid>
         </Grid>
 
-        {/* User Management */}
-        <UserManagement />
+        {/* Tabs Section */}
+        <Paper sx={{ mt: 4 }}>
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            centered
+            indicatorColor="primary"
+            textColor="primary"
+            variant="fullWidth"
+          >
+            <Tab label="User Management" />
+            <Tab label="Quiz Management" />
+            <Tab label="Question Management" />
+            <Tab label="Answer Management" />
+          </Tabs>
+
+          <Box sx={{ p: 2 }}>
+            {tabIndex === 0 && <UserManagement />}
+            {tabIndex === 1 && <AdminQuizManagement />}
+            {tabIndex === 2 && <AdminQuestionManagement />}
+            {tabIndex === 3 && <AdminAnswerManagement />}
+          </Box>
+
+        </Paper>
       </Container>
     </Box>
   );

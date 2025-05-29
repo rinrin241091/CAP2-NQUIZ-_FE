@@ -128,4 +128,22 @@ export const getAIExplanation = (questionText) => {
 };
 
 
+export const adminGetAllQuizzes = () => api.get('/api/admin/quizzes');
+export const adminCreateQuiz = (data) => api.post('/api/admin/quizzes', data);
+export const adminUpdateQuizById = (id, data) => api.put(`/api/admin/quizzes/${id}`, data);
+export const adminDeleteQuizById = (id) => api.delete(`/api/admin/quizzes/${id}`);
+// -- Question Admin --
+export const adminGetAllQuestions = () => api.get('/api/admin/questions');
+export const adminGetQuestionById = (id) => api.get(`/api/admin/questions/${id}`);
+export const adminCreateQuestion = (data) => api.post('/api/admin/questions', data);
+export const adminUpdateQuestionById = (id, data) => api.put(`/api/admin/questions/${id}`, data);
+export const adminDeleteQuestionById = (id) => api.delete(`/api/admin/questions/${id}`);
+
+// -- Answer Admin --
+export const adminGetAllAnswers = () => api.get('/api/admin/answers');
+export const adminGetAnswerById = (id) => api.get(`/api/admin/answers/${id}`);
+export const adminCreateAnswer = (data) => api.post('/api/admin/answers', data);
+export const adminUpdateAnswerById = (id, data) => api.put(`/api/admin/answers/${id}`, data);
+export const adminDeleteAnswerById = (id) => api.delete(`/api/admin/answers/${id}`);
+
 export default api;
