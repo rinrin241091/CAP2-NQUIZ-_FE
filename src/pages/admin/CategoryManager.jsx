@@ -22,7 +22,7 @@ const CategoryManager = ({ open, onClose }) => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axiosInstance.get('/categoriess');
+      const res = await axiosInstance.get('/categories');
       setCategories(res.data?.data || []);
     } catch (err) {
       console.error('Failed to fetch categories:', err);
