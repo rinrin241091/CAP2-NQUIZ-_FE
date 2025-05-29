@@ -14,9 +14,12 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import axiosInstance from '../services/axiosConfig';
 import '../styles/CreateQuiz.css';
+import { useNavigate } from 'react-router-dom';
+import CategoryManager from '../pages/admin/CategoryManager';
 
 const CreateQuiz = ({ open, onClose }) => {
   const [categories, setCategories] = useState([]);
+  const [openCategoryManager, setOpenCategoryManager] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -26,6 +29,7 @@ const CreateQuiz = ({ open, onClose }) => {
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -78,26 +82,16 @@ const handleSubmit = async (e) => {
 };
 
 
+const fetchCategories = async () => {
+  try {
+    const res = await axiosInstance.get('/categories');
+    setCategories(res.data?.data || []);
+  } catch (err) {
+    console.error('Failed to fetch categories:', err);
+  }
+};
+
 useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      const user = storedUser ? JSON.parse(storedUser) : null;
-      const user_id = user ? user.user_id : null; // 🔄 Sửa từ user.id => user.user_id
-      if (!user_id) return;
-
-      const res = await axiosInstance.get('/categories', {
-        params: { user_id }
-      });
-
-      setCategories(
-        Array.isArray(res.data?.data) ? res.data.data : []
-      );
-    } catch (err) {
-      console.error('Lỗi khi lấy danh mục:', err);
-    }
-  };
-
   fetchCategories();
 }, []);
 
@@ -110,6 +104,17 @@ useEffect(() => {
       }));
     }
   }, [categories]);
+
+  // Thêm hàm mở dialog CategoryManager
+  const handleOpenCategoryManager = () => {
+    setOpenCategoryManager(true);
+  };
+
+  // Thêm hàm đóng dialog CategoryManager và làm mới danh mục
+  const handleCloseCategoryManager = () => {
+    setOpenCategoryManager(false);
+    fetchCategories(); // Làm mới danh sách danh mục
+  };
 
   return (
     <Dialog open={open} onClose={() => onClose(null)} maxWidth="sm" fullWidth>
@@ -182,17 +187,31 @@ useEffect(() => {
           />
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => onClose(null)} disabled={loading}>
-            Hủy
+        <DialogActions sx={{ display: 'flex', justifyContent: 'space-between', px: 3 }}>
+           {/* Nút trái */}
+          {/* Sửa nút Category Manager để mở dialog */}
+          <Button onClick={handleOpenCategoryManager}>
+            Category Manager
           </Button>
-          <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={20} /> : 'Tạo Quiz'}
-          </Button>
+
+          {/* Nút phải */}
+          <div>
+            <Button onClick={() => onClose(null)} disabled={loading} sx={{ mr: 1 }}>
+              Hủy
+            </Button>
+            <Button type="submit" variant="contained" disabled={loading}>
+              {loading ? <CircularProgress size={20} /> : 'Tạo Quiz'}
+            </Button>
+          </div>
         </DialogActions>
+
       </form>
+      {/* Thêm popup CategoryManager */}
+      <CategoryManager open={openCategoryManager} onClose={handleCloseCategoryManager} />
     </Dialog>
   );
 };
 
 export default CreateQuiz;
+
+
